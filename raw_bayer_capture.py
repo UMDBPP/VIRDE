@@ -1,4 +1,4 @@
-## http://picamera.readthedocs.io/en/release-1.10/recipes2.html#bayer-data
+# http://picamera.readthedocs.io/en/release-1.10/recipes2.html#bayer-data
 
 import time
 import picamera

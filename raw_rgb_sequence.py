@@ -1,4 +1,4 @@
-## http://picamera.readthedocs.io/en/release-1.13/recipes1.html#capturing-consistent-images
+# http://picamera.readthedocs.io/en/release-1.13/recipes1.html#capturing-consistent-images
 
 from time import sleep
 from picamera import PiCamera
