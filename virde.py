@@ -1,6 +1,7 @@
 # modified from https://www.raspberrypi.org/learning/sense-hat-data-logger/code/Sense_Logger_v4.py
 
 # imports
+import os
 from datetime import datetime
 from threading import Thread
 from time import sleep, time
@@ -10,17 +11,20 @@ from picamera import PiCamera
 
 # instantiate hardware objects
 sensehat = SenseHat()
-camera = PiCamera()
+camera = PiCamera(sensor_mode = 2)
 
 # define logging intervals in seconds
 sensehat_logging_interval = 1
 picamera_logging_interval = 6
 
 # define path to log directory
-logdir = '~/Desktop/virde_log/'
+logdir = '/home/pi/Desktop/virde_log/'
+
+if not os.path.exists(logdir):
+    os.mkdir(logdir)
 
 # append datetime to filename and open logfile as append connection
-logfile = open(logdir + 'log' + '_' + str(int(time.time())) + '.csv', 'a')
+logfile = open(os.path.join(logdir, 'log' + '_' + str(int(time())) + '.csv'), 'a')
 
 # construct logfile header
 header = ['datetime']
@@ -72,10 +76,10 @@ def picamera_logging_thread():
         sleep(3)
         
         # capture in PNG format at native resolution
-        camera.capture(logdir + 'image' + '_' + str(int(time.time())) + '.png')
+        camera.capture(logdir + 'image' + '_' + str(int(time())) + '.png')
         
         # capture in unencoded RGB format
-        camera.capture(logdir + 'image' + '_' + str(int(time.time())) + '.data', 'rgb')
+        camera.capture(logdir + 'image' + '_' + str(int(time())) + '.data', 'rgb')
         
         sleep(picamera_logging_interval)
 
