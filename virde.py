@@ -6,20 +6,20 @@ from datetime import datetime
 from threading import Thread
 from time import sleep, time
 
-import pygame
-from pygame.locals import *
+#import pygame
+#from pygame.locals import *
 from sense_hat import SenseHat
 from picamera import PiCamera
 
 # instantiate sensehat and pygame
 sensehat = SenseHat()
-pygame.init()
+#pygame.init()
 
 # define logging intervals in seconds
 sensehat_logging_interval = 1
 picamera_logging_interval = 6
 
-timeout = picamera_logging_interval * 3
+timeout = picamera_logging_interval * 10
 start_time = time()
 
 # define path to log directory
@@ -104,17 +104,22 @@ def picamera_logging_thread():
         sleep(picamera_logging_interval - 1)
 
 # start logging threads
-#Thread(target = sensehat_logging_thread).start()
-#Thread(target = picamera_logging_thread).start()
+Thread(target = sensehat_logging_thread).start()
+Thread(target = picamera_logging_thread).start()
 
-while time() < start_time + timeout:
-    for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            if event.key == K_RETURN:
-                for second in range(10, 0):
-                    sensehat.show_letter(second)
-                    sensor_log_file.write(get_sensehat_csv_line(sensehat) + '\n')
-                    sleep(1)
-                picamera_capture()
-                sensehat.clear()
-                
+###print("starting input loop")
+##
+##while True:#time() < start_time + timeout:
+##    for event in pygame.event.get():
+##        if event.type == KEYDOWN:
+##            if event.key == K_RIGHT:
+##                print("Taking picture")
+##                for second in range(10, 0):
+##                    sensehat.show_letter(str(second))
+##                    print(str(second))
+##                    sensor_log_file.write(get_sensehat_csv_line(sensehat) + '\n')
+##                    sleep(1)
+##                picamera_capture()
+##                sensehat.clear()
+
+#sensehat.show_message("DONE")
