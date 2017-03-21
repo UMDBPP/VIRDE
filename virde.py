@@ -13,6 +13,9 @@ from picamera import PiCamera
 sensehat = SenseHat()
 camera = PiCamera(sensor_mode = 2)
 
+timeout = 12   # [seconds]
+timeout_start = time()
+
 # define logging intervals in seconds
 sensehat_logging_interval = 1
 picamera_logging_interval = 6
@@ -65,12 +68,12 @@ def get_sensehat_csv_line(sensehat):
     return ','.join(str(value) for value in output_data)
 
 def sensehat_logging_thread(logfile):
-    while True:
+    while time() < timeout_start + timeout:
         logfile.write(get_sensehat_csv_line(sensehat) + '\n')
         sleep(sensehat_logging_interval)
       
 def picamera_logging_thread():
-    while True:      
+    while time() < timeout_start + timeout:
         # let automatic exposure settle
         camera.start_preview()
         sleep(3)
@@ -81,7 +84,7 @@ def picamera_logging_thread():
         # capture in unencoded RGB format
         camera.capture(logdir + 'image' + '_' + str(int(time())) + '.data', 'rgb')
         
-        sleep(picamera_logging_interval)
+        sleep(picamera_logging_interval - 3)
 
 # start logging threads
 Thread(target = sensehat_logging_thread).start()
