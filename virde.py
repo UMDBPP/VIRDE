@@ -116,7 +116,7 @@ def picamera_logging_thread():
             logger.info('Saved image ' + image_name + '.png')
     
             # capture in unencoded RGB formatter
-            camera.capture(os.path.join(image_dir, 'image_' + image_name + '.data'), 'rgb')
+            camera.capture(os.path.join(image_dir, image_name + '.data'), 'rgb')
             logger.info('Saved image ' + image_name + '.data')
         
         # delay the specified interval
