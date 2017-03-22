@@ -5,11 +5,15 @@ import os
 from datetime import datetime
 from threading import Thread
 from time import sleep, time
+import logging
 
 #import pygame
 #from pygame.locals import *
 from sense_hat import SenseHat
 from picamera import PiCamera
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.info('Starting script...')
 
 # instantiate sensehat and pygame
 sensehat = SenseHat()
@@ -84,15 +88,19 @@ def picamera_capture():
         # let automatic exposure settle
         sleep(1)
 
+        image_name = 'image_' + str(int(time()))
         # capture in PNG format at native resolution
-        camera.capture(os.path.join(image_dir, 'image_' + str(int(time())) + '.png'))
+        camera.capture(os.path.join(image_dir, image_name + '.png'))
+        logging.info('Saved image ' + image_name + '.png')
         
         # capture in unencoded RGB format
-        camera.capture(os.path.join(image_dir, 'image_' + str(int(time())) + '.data'), 'rgb')
+        camera.capture(os.path.join(image_dir, 'image_' + image_name + '.data'), 'rgb')
+        logging.info('Saved image ' + image_name + '.data')
 
 def sensehat_logging_thread():
     while time() < start_time + timeout:
         sensor_log_file.write(get_sensehat_csv_line(sensehat) + '\n')
+        logging.info('Appended line to ' + sensor_log_file)
         sleep(sensehat_logging_interval)
       
 def picamera_logging_thread():
