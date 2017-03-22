@@ -12,9 +12,6 @@ import logging
 from sense_hat import SenseHat
 from picamera import PiCamera
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
-logging.info('Starting script...')
-
 # instantiate libraries
 sensehat = SenseHat()
 #pygame.init()
@@ -29,6 +26,21 @@ start_time = time()
 # define path to log directory
 log_dir = '/home/pi/Desktop/virde_log/'
 
+# create logger to log all escalated at and above INFO
+logger = logging.getLogger('events logger')
+logger.setLevel(logging.INFO)
+
+# add a file handler
+file_handler = logging.FileHandler(log_dir + 'events_log_' + str(int(start_time)) + '.csv')
+file_handler.setLevel(logging.DEBUG) # ensure all messages are logged to file
+
+# create a formatter and set the formatter for the handler.
+formatter = logging.Formatter('%(asctime)s,%(levelname)s,%(message)s')
+file_handler.setFormatter(formatter)
+
+# add the Handler to the logger
+logger.addHandler(file_handler)
+
 # create path to log directory if it doesn't exist
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
@@ -39,10 +51,11 @@ image_dir = os.path.join(log_dir, 'images_' + str(int(start_time)))
 # create image directory if it doesn't exist
 if not os.path.exists(image_dir):
     os.mkdir(image_dir)
-            
+
 # append datetime to filename and open logfile with append connection
 sensor_log_filename = os.path.join(log_dir, 'sensor_log_' + str(int(start_time)) + '.csv')
-sensor_log_file = open(sensor_log_filename, 'a')
+sensor_log = open(sensor_log_filename, 'a')
+logger.info('Created sensor log at ' + sensor_log_filename)
 
 # construct CSV header
 header = ['datetime']
@@ -56,7 +69,7 @@ header.extend(['accel_x', 'accel_y', 'accel_z'])
 header.extend(['gyro_x', 'gyro_y', 'gyro_z'])
 
 # write header to file
-sensor_log_file.write(','.join(str(value) for value in header) + '\n')
+sensor_log.write(','.join(str(value) for value in header) + '\n')
 
 # define function to return a csv line of all sensehat data
 def get_sensehat_csv_line(sensehat):
@@ -84,8 +97,8 @@ def get_sensehat_csv_line(sensehat):
 
 def sensehat_logging_thread():
     while time() < start_time + timeout:
-        sensor_log_file.write(get_sensehat_csv_line(sensehat) + '\n')
-        logging.debug('Appended line to ' + sensor_log_filename)
+        sensor_log.write(get_sensehat_csv_line(sensehat) + '\n')
+        logger.info('Appended line to ' + sensor_log_filename)
         sleep(sensehat_logging_interval)
       
 def picamera_logging_thread():
@@ -98,13 +111,13 @@ def picamera_logging_thread():
             sleep(2)
     
             image_name = 'image_' + str(int(time()))
-            # capture in PNG format at native resolution
+            # capture in PNG formatter at native resolution
             camera.capture(os.path.join(image_dir, image_name + '.png'))
-            logging.info('Saved image ' + image_name + '.png')
+            logger.info('Saved image ' + image_name + '.png')
     
-            # capture in unencoded RGB format
+            # capture in unencoded RGB formatter
             camera.capture(os.path.join(image_dir, 'image_' + image_name + '.data'), 'rgb')
-            logging.info('Saved image ' + image_name + '.data')
+            logger.info('Saved image ' + image_name + '.data')
         
         # delay the specified interval
         sleep(picamera_logging_interval - 2)
@@ -123,7 +136,7 @@ Thread(target = picamera_logging_thread).start()
 ##                for second in range(10, 0):
 ##                    sensehat.show_letter(str(second))
 ##                    print(str(second))
-##                    sensor_log_file.write(get_sensehat_csv_line(sensehat) + '\n')
+##                    sensor_log.write(get_sensehat_csv_line(sensehat) + '\n')
 ##                    sleep(1)
 ##                picamera_capture()
 ##                sensehat.clear()
