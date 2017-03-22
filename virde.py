@@ -23,7 +23,7 @@ sensehat = SenseHat()
 sensehat_logging_interval = 1
 picamera_logging_interval = 6
 
-timeout = picamera_logging_interval * 10
+timeout = picamera_logging_interval * 20
 start_time = time()
 
 # define path to log directory
