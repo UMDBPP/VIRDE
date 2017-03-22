@@ -15,15 +15,15 @@ from picamera import PiCamera
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 logging.info('Starting script...')
 
-# instantiate sensehat and pygame
+# instantiate libraries
 sensehat = SenseHat()
 #pygame.init()
 
 # define logging intervals in seconds
 sensehat_logging_interval = 1
-picamera_logging_interval = 6
+picamera_logging_interval = 5
 
-timeout = picamera_logging_interval * 20
+timeout = picamera_logging_interval * 10
 start_time = time()
 
 # define path to log directory
@@ -41,7 +41,8 @@ if not os.path.exists(image_dir):
     os.mkdir(image_dir)
             
 # append datetime to filename and open logfile with append connection
-sensor_log_file = open(os.path.join(log_dir, 'sensor_log_' + str(int(start_time)) + '.csv'), 'a')
+sensor_log_filename = os.path.join(log_dir, 'sensor_log_' + str(int(start_time)) + '.csv')
+sensor_log_file = open(sensor_log_filename, 'a')
 
 # construct CSV header
 header = ['datetime']
@@ -81,35 +82,32 @@ def get_sensehat_csv_line(sensehat):
     # return output data in comma separated form
     return ','.join(str(value) for value in output_data)
 
-def picamera_capture():
-    with PiCamera(sensor_mode = 2) as camera:
-        camera.resolution = (3280, 2464)
-    
-        # let automatic exposure settle
-        sleep(1)
-
-        image_name = 'image_' + str(int(time()))
-        # capture in PNG format at native resolution
-        camera.capture(os.path.join(image_dir, image_name + '.png'))
-        logging.info('Saved image ' + image_name + '.png')
-        
-        # capture in unencoded RGB format
-        camera.capture(os.path.join(image_dir, 'image_' + image_name + '.data'), 'rgb')
-        logging.info('Saved image ' + image_name + '.data')
-
 def sensehat_logging_thread():
     while time() < start_time + timeout:
         sensor_log_file.write(get_sensehat_csv_line(sensehat) + '\n')
-        logging.info('Appended line to ' + sensor_log_file)
+        logging.debug('Appended line to ' + sensor_log_filename)
         sleep(sensehat_logging_interval)
       
 def picamera_logging_thread():
     while time() < start_time + timeout:
-        # capture image
-        picamera_capture()
-
+        with PiCamera(sensor_mode = 2) as camera:
+            # define as full resolution
+            camera.resolution = (3280, 2464)
+        
+            # let automatic exposure settle
+            sleep(2)
+    
+            image_name = 'image_' + str(int(time()))
+            # capture in PNG format at native resolution
+            camera.capture(os.path.join(image_dir, image_name + '.png'))
+            logging.info('Saved image ' + image_name + '.png')
+    
+            # capture in unencoded RGB format
+            camera.capture(os.path.join(image_dir, 'image_' + image_name + '.data'), 'rgb')
+            logging.info('Saved image ' + image_name + '.data')
+        
         # delay the specified interval
-        sleep(picamera_logging_interval - 1)
+        sleep(picamera_logging_interval - 2)
 
 # start logging threads
 Thread(target = sensehat_logging_thread).start()
