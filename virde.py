@@ -28,7 +28,7 @@ log_dir = '/home/pi/Desktop/virde_log/'
 
 # create logger to log all escalated at and above INFO
 logger = logging.getLogger('events logger')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 # add a file handler
 file_handler = logging.FileHandler(log_dir + 'events_log_' + str(int(start_time)) + '.csv')
