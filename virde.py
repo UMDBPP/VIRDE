@@ -20,8 +20,8 @@ sensehat = SenseHat()
 sensehat_logging_interval = 1
 picamera_logging_interval = 4
 
-timeout = 30
 start_time = time()
+timeout = 30
 
 # define path to log directory
 log_dir = '/home/pi/Desktop/virde_log/'
@@ -106,7 +106,10 @@ def sensehat_logging_thread():
 def picamera_logging_thread():
     logger.info('Started camera logging thread')
     while time() < start_time + timeout:
-        with PiCamera(sensor_mode = 2, resolution = (3280, 2464)) as camera:          
+        with PiCamera() as camera:
+            # set values
+            camera.resolution = (3280, 2464)
+            
             # let automatic exposure settle
             sleep(2)
             image_name = 'image_' + str(int(time()))
@@ -127,23 +130,8 @@ def picamera_logging_thread():
         sleep(picamera_logging_interval - 4)
     logger.info('Stopped camera logging thread')
 
+start_time = time()
+
 # start logging threads
 Thread(target = sensehat_logging_thread).start()
 Thread(target = picamera_logging_thread).start()
-
-###print("starting input loop")
-##
-##while True:#time() < start_time + timeout:
-##    for event in pygame.event.get():
-##        if event.type == KEYDOWN:
-##            if event.key == K_RIGHT:
-##                print("Taking picture")
-##                for second in range(10, 0):
-##                    sensehat.show_letter(str(second))
-##                    print(str(second))
-##                    sensor_log.write(get_sensehat_csv_line(sensehat) + '\n')
-##                    sleep(1)
-##                picamera_capture()
-##                sensehat.clear()
-
-#sensehat.show_message("DONE")
