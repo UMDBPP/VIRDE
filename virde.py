@@ -18,9 +18,9 @@ sensehat = SenseHat()
 
 # define logging intervals in seconds
 sensehat_logging_interval = 1
-picamera_logging_interval = 5
+picamera_logging_interval = 4
 
-timeout = picamera_logging_interval * 10
+timeout = picamera_logging_interval * 5
 start_time = time()
 
 # define path to log directory
@@ -115,12 +115,14 @@ def picamera_logging_thread():
             camera.capture(os.path.join(image_dir, image_name + '.png'))
             logger.info('Saved image ' + image_name + '.png')
     
+            sleep(2)
+            
             # capture in unencoded RGB formatter
             camera.capture(os.path.join(image_dir, image_name + '.data'), 'rgb')
             logger.info('Saved image ' + image_name + '.data')
         
         # delay the specified interval
-        sleep(picamera_logging_interval - 2)
+        sleep(picamera_logging_interval - 4)
 
 # start logging threads
 Thread(target = sensehat_logging_thread).start()
