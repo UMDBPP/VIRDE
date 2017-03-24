@@ -106,7 +106,7 @@ def sensehat_logging_thread():
 def picamera_logging_thread():
     logger.info('Started camera logging thread')
     while time() < start_time + timeout:
-        with PiCamera(sensor_mode = 2) as camera:
+        with PiCamera(sensor_mode = 2, resolution = (3280, 2464)) as camera:          
             # let automatic exposure settle
             sleep(2)
             image_name = 'image_' + str(int(time()))
