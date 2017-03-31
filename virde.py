@@ -7,6 +7,7 @@ from threading import Thread
 from time import sleep, time
 import logging
 import picamera
+import picamera.array
 from sense_hat import SenseHat
 import numpy
 
@@ -28,7 +29,7 @@ logger.setLevel(logging.DEBUG)
 
 # add a file handler
 file_handler = logging.FileHandler(log_dir + 'events_log_' + str(int(start_time)) + '.csv')
-file_handler.setLevel(logging.DEBUG) # ensure all messages are logged to file
+file_handler.setLevel(logging.DEBUG)  # ensure all messages are logged to file
 
 # create a formatter and set the formatter for the handler.
 formatter = logging.Formatter('%(asctime)s,%(levelname)s,%(message)s')
@@ -50,7 +51,6 @@ if not os.path.exists(image_dir):
 
 # append datetime to filename and open logfile with append connection
 sensor_log_filename = os.path.join(log_dir, 'sensor_log_' + str(int(start_time)) + '.csv')
-sensor_log = open(sensor_log_filename, 'a')
 logger.info('Created sensor log at ' + sensor_log_filename)
 
 # construct CSV header
@@ -65,7 +65,8 @@ header.extend(['accel_x', 'accel_y', 'accel_z'])
 header.extend(['gyro_x', 'gyro_y', 'gyro_z'])
 
 # write header to file
-sensor_log.write(','.join(str(value) for value in header) + '\n')
+with open(sensor_log_filename, 'w') as sensor_log:
+    sensor_log.write(','.join(str(value) for value in header) + '\n')
 
 # define function to return a csv line of all sensehat data
 def get_sensehat_csv_line():
@@ -94,7 +95,8 @@ def get_sensehat_csv_line():
 def sensehat_logging_thread():
     logger.info('Started sensor logging thread')
     while time() < start_time + timeout:
-        sensor_log.write(get_sensehat_csv_line() + '\n')
+        with open(sensor_log_filename, 'a') as sensor_log:
+            sensor_log.write(get_sensehat_csv_line() + '\n')
         logger.info('Appended line to ' + sensor_log_filename)
         sleep(sensehat_logging_interval)
     logger.info('Stopped sensor logging thread')
@@ -102,10 +104,10 @@ def sensehat_logging_thread():
 def picamera_logging_thread():
     logger.info('Started camera logging thread')
     while time() < start_time + timeout:
-        with picamera.PiCamera(sensor_mode = 2, resolution = '3280x2464') as camera:
+        with picamera.PiCamera(sensor_mode=2, resolution='3280x2464') as camera:
             # set values
             print(camera.sensor_mode)
-            print(camera.resolution)# = (3280, 2464)
+            print(camera.resolution)  # = (3280, 2464)
             
             # let automatic exposure settle
             sleep(2)
@@ -119,17 +121,20 @@ def picamera_logging_thread():
             sleep(2)
             image_name = 'image_' + str(int(time()))
 
-            # capture in unencoded RGB format
-            camera.capture(os.path.join(image_dir, image_name + '.data'), 'rgb')
-            logger.info('Saved image ' + image_name + '.data')
+            # capture as unencoded RGB (after preprocessing) to binary file
+            with open(os.path.join(image_dir, image_name + '.rgb'), 'wb') as binary_file:
+                camera.capture(binary_file, 'rgb')
+            
+            logger.info('Saved image ' + image_name + '.rgb')
 
+            # capture as demosaiced Bayer data (raw signal) to binary file
             with picamera.array.PiBayerArray(camera) as stream:
                 camera.capture(stream, 'jpeg', bayer=True)
                 # Demosaic data and write to output (just use stream.array if you
                 # want to skip the demosaic step)
-                output = (stream.demosaic() >> 2).astype(np.uint8)
-                with open('image.data', 'wb') as f:
-                    output.tofile(f)
+                output = (stream.demosaic() >> 2).astype(numpy.uint8)
+                with open(os.path.join(image_dir, image_name + '_bayer.rgb'), 'wb') as binary_file:
+                    output.tofile(binary_file)
         
         # delay the specified interval
         sleep(picamera_logging_interval - 4)
@@ -138,5 +143,5 @@ def picamera_logging_thread():
 start_time = time()
 
 # start logging threads
-Thread(target = sensehat_logging_thread).start()
-Thread(target = picamera_logging_thread).start()
+Thread(target=sensehat_logging_thread).start()
+Thread(target=picamera_logging_thread).start()
