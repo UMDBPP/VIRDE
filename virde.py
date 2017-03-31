@@ -6,22 +6,17 @@ from datetime import datetime
 from threading import Thread
 from time import sleep, time
 import logging
-
-#import pygame
-#from pygame.locals import *
+import picamera
 from sense_hat import SenseHat
-from picamera import PiCamera
 
-# instantiate libraries
 sensehat = SenseHat()
-#pygame.init()
 
 # define logging intervals in seconds
 sensehat_logging_interval = 1
-picamera_logging_interval = 4
+picamera_logging_interval = 5
 
 start_time = time()
-timeout = 30
+timeout = 10
 
 # define path to log directory
 log_dir = '/home/pi/Desktop/virde_log/'
@@ -72,7 +67,7 @@ header.extend(['gyro_x', 'gyro_y', 'gyro_z'])
 sensor_log.write(','.join(str(value) for value in header) + '\n')
 
 # define function to return a csv line of all sensehat data
-def get_sensehat_csv_line(sensehat):
+def get_sensehat_csv_line():
     output_data = [datetime.now()]
 
     output_data.append(sensehat.get_temperature_from_humidity())
@@ -98,7 +93,7 @@ def get_sensehat_csv_line(sensehat):
 def sensehat_logging_thread():
     logger.info('Started sensor logging thread')
     while time() < start_time + timeout:
-        sensor_log.write(get_sensehat_csv_line(sensehat) + '\n')
+        sensor_log.write(get_sensehat_csv_line() + '\n')
         logger.info('Appended line to ' + sensor_log_filename)
         sleep(sensehat_logging_interval)
     logger.info('Stopped sensor logging thread')
@@ -106,9 +101,10 @@ def sensehat_logging_thread():
 def picamera_logging_thread():
     logger.info('Started camera logging thread')
     while time() < start_time + timeout:
-        with PiCamera() as camera:
+        with picamera.PiCamera() as camera:
             # set values
-            camera.resolution = (3280, 2464)
+            camera.sensor_mode = 2
+            #camera.resolution = (3280, 2464)
             
             # let automatic exposure settle
             sleep(2)
