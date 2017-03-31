@@ -8,6 +8,7 @@ from time import sleep, time
 import logging
 import picamera
 from sense_hat import SenseHat
+import numpy
 
 sensehat = SenseHat()
 
@@ -101,10 +102,10 @@ def sensehat_logging_thread():
 def picamera_logging_thread():
     logger.info('Started camera logging thread')
     while time() < start_time + timeout:
-        with picamera.PiCamera() as camera:
+        with picamera.PiCamera(sensor_mode = 2, resolution = '3280x2464') as camera:
             # set values
-            camera.sensor_mode = 2
-            #camera.resolution = (3280, 2464)
+            print(camera.sensor_mode)
+            print(camera.resolution)# = (3280, 2464)
             
             # let automatic exposure settle
             sleep(2)
@@ -121,6 +122,14 @@ def picamera_logging_thread():
             # capture in unencoded RGB format
             camera.capture(os.path.join(image_dir, image_name + '.data'), 'rgb')
             logger.info('Saved image ' + image_name + '.data')
+
+            with picamera.array.PiBayerArray(camera) as stream:
+                camera.capture(stream, 'jpeg', bayer=True)
+                # Demosaic data and write to output (just use stream.array if you
+                # want to skip the demosaic step)
+                output = (stream.demosaic() >> 2).astype(np.uint8)
+                with open('image.data', 'wb') as f:
+                    output.tofile(f)
         
         # delay the specified interval
         sleep(picamera_logging_interval - 4)
