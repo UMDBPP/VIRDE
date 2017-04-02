@@ -127,7 +127,7 @@ def picamera_logging_thread():
                 logger.info('Saved rgb data to ' + image_name)
 
             # capture Bayer data to binary file after demosaicing
-            with os.path.join(image_dir, 'rgb_bayer_' + str(int(time())), '.rgb'):
+            with os.path.join(image_dir, 'rgb_bayer_' + str(int(time())), '.rgb') as image_name:
                 with picamera.array.PiBayerArray(camera) as stream:
                     # capture to stream as bayer data
                     camera.capture(stream, 'jpeg', bayer = True)
@@ -151,5 +151,5 @@ def picamera_logging_thread():
 start_time = time()
 
 # start logging threads
-Thread(target=sensehat_logging_thread).start()
-Thread(target=picamera_logging_thread).start()
+Thread(target = sensehat_logging_thread).start()
+Thread(target = picamera_logging_thread).start()
