@@ -17,7 +17,7 @@ sensehat = SenseHat()
 
 # define logging intervals in seconds
 sensehat_logging_interval = 1
-picamera_logging_interval = 5
+picamera_logging_interval = 2
 
 start_time = time()
 timeout = 10
@@ -111,24 +111,23 @@ def picamera_logging_thread():
             camera.resolution = (3280, 2464)
             
             # let automatic exposure settle
-            sleep(2)
+            #sleep(2)
 
             # capture PNG image            
-            with os.path.join(image_dir, 'image_' + str(int(time())), '.png') as image_name:
-                # capture PNG format
-                camera.capture(image_name)
-            logger.info('Saved image ' + image_name)
+            #with os.path.join(image_dir, 'image_' + str(int(time())), '.png') as image_name:
+            #    camera.capture(image_name)
+            #logger.info('Saved image ' + image_name)
 
+            # capture unencoded RGB directly to binary file
             with os.path.join(image_dir, 'rgb_' + str(int(time())), '.rgb') as image_name:
-                # capture unencoded RGB directly to binary file
                 with open(image_name, 'wb') as binary_file:
                     camera.capture(binary_file, 'rgb')
                 
                 # log image save
                 logger.info('Saved rgb data to ' + image_name)
 
+            # capture Bayer data to binary file after demosaicing
             with os.path.join(image_dir, 'rgb_bayer_' + str(int(time())), '.rgb'):
-                # capture Bayer data to binary file after demosaicing
                 with picamera.array.PiBayerArray(camera) as stream:
                     # capture to stream as bayer data
                     camera.capture(stream, 'jpeg', bayer = True)
@@ -143,7 +142,7 @@ def picamera_logging_thread():
                         print('Saved ' + output.array.shape[1] + 'x' + output.array.shape[0] + ' Bayer data to ' + image_name + '_bayer.rgb')
         
         # delay the specified interval
-        sleep(picamera_logging_interval - 4)
+        sleep(picamera_logging_interval)
 
     # log camera thread completion
     logger.info('Stopped camera logging thread')
