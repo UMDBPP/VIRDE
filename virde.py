@@ -1,15 +1,17 @@
 # modified from https://www.raspberrypi.org/learning/sense-hat-data-logger/code/Sense_Logger_v4.py
 
-# imports
+# package imports
 import os
 from datetime import datetime
 from threading import Thread
 from time import sleep, time
 import logging
+import numpy
+
+# Raspberry Pi hardware imports
 import picamera
 import picamera.array
 from sense_hat import SenseHat
-import numpy
 
 sensehat = SenseHat()
 
@@ -104,42 +106,49 @@ def sensehat_logging_thread():
 def picamera_logging_thread():
     logger.info('Started camera logging thread')
     while time() < start_time + timeout:
-        with picamera.PiCamera(sensor_mode=2, resolution='3280x2464') as camera:
-            # set values
-            print(camera.sensor_mode)
-            print(camera.resolution)  # = (3280, 2464)
+        with picamera.PiCamera() as camera:
+            # set to maximum v2 resolution
+            camera.resolution = (3280, 2464)
             
             # let automatic exposure settle
             sleep(2)
-            image_name = 'image_' + str(int(time()))
-            
-            # capture in PNG format at native resolution
-            camera.capture(os.path.join(image_dir, image_name + '.png'))
-            logger.info('Saved image ' + image_name + '.png')
 
-            # let automatic exposure settle
-            sleep(2)
-            image_name = 'image_' + str(int(time()))
+            # capture PNG image            
+            with os.path.join(image_dir, 'image_' + str(int(time())), '.png') as image_name:
+                # capture PNG format
+                camera.capture(image_name)
+            logger.info('Saved image ' + image_name)
 
-            # capture as unencoded RGB (after preprocessing) to binary file
-            with open(os.path.join(image_dir, image_name + '.rgb'), 'wb') as binary_file:
-                camera.capture(binary_file, 'rgb')
-            
-            logger.info('Saved image ' + image_name + '.rgb')
+            with os.path.join(image_dir, 'rgb_' + str(int(time())), '.rgb') as image_name:
+                # capture unencoded RGB directly to binary file
+                with open(image_name, 'wb') as binary_file:
+                    camera.capture(binary_file, 'rgb')
+                
+                # log image save
+                logger.info('Saved rgb data to ' + image_name)
 
-            # capture as demosaiced Bayer data (raw signal) to binary file
-            with picamera.array.PiBayerArray(camera) as stream:
-                camera.capture(stream, 'jpeg', bayer=True)
-                # Demosaic data and write to output (just use stream.array if you
-                # want to skip the demosaic step)
-                output = (stream.demosaic() >> 2).astype(numpy.uint8)
-                with open(os.path.join(image_dir, image_name + '_bayer.rgb'), 'wb') as binary_file:
-                    output.tofile(binary_file)
+            with os.path.join(image_dir, 'rgb_bayer_' + str(int(time())), '.rgb'):
+                # capture Bayer data to binary file after demosaicing
+                with picamera.array.PiBayerArray(camera) as stream:
+                    # capture to stream as bayer data
+                    camera.capture(stream, 'jpeg', bayer = True)
+                    
+                    # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
+                    with (stream.demosaic() >> 2).astype(numpy.uint8) as output:
+                        # save to file
+                        with open(image_name, 'wb') as binary_file:
+                            output.tofile(binary_file)
+                    
+                        # log image save
+                        print('Saved ' + output.array.shape[1] + 'x' + output.array.shape[0] + ' Bayer data to ' + image_name + '_bayer.rgb')
         
         # delay the specified interval
         sleep(picamera_logging_interval - 4)
+
+    # log camera thread completion
     logger.info('Stopped camera logging thread')
 
+# define starting time for thread completion
 start_time = time()
 
 # start logging threads
