@@ -114,12 +114,12 @@ def picamera_logging_thread():
             #sleep(2)
 
             # capture PNG image            
-            #with os.path.join(image_dir, 'image_' + str(int(time())), '.png') as image_name:
+            #with (image_dir + '/' + 'image_' + str(int(time())) + '.png') as image_name:
             #    camera.capture(image_name)
             #logger.info('Saved image ' + image_name)
 
             # capture unencoded RGB directly to binary file
-            with os.path.join(image_dir, 'rgb_' + str(int(time())), '.rgb') as image_name:
+            with (image_dir + '/' + 'rgb_' + str(int(time())) + '.rgb') as image_name:
                 with open(image_name, 'wb') as binary_file:
                     camera.capture(binary_file, 'rgb')
                 
@@ -127,7 +127,7 @@ def picamera_logging_thread():
                 logger.info('Saved rgb data to ' + image_name)
 
             # capture Bayer data to binary file after demosaicing
-            with os.path.join(image_dir, 'rgb_bayer_' + str(int(time())), '.rgb') as image_name:
+            with (image_dir + '/' + 'rgb_bayer_' + str(int(time())) + '.rgb') as image_name:
                 with picamera.array.PiBayerArray(camera) as stream:
                     # capture to stream as bayer data
                     camera.capture(stream, 'jpeg', bayer = True)
