@@ -40,11 +40,11 @@ class FormatterWithHeader(logging.Formatter):
         return self.header + "\n" + self.format(record)
 
 # add headers to log files
-with open(log_dir + 'events.log', 'w') as events_log:
+with open(os.path.join(log_dir, 'events.log'), 'w') as events_log:
     events_log.write('DateTime,Message')
-with open(log_dir + 'sensor.log', 'w') as sensor_log:
+with open(os.path.join(log_dir, 'sensor.log'), 'w') as sensor_log:
     sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z')
-with open(log_dir + 'images.log', 'w') as images_log:
+with open(os.path.join(log_dir, 'images.log'), 'w') as images_log:
     images_log.write('DateTime,ImagePath')
     
 # create loggers
@@ -58,9 +58,9 @@ sensor_logger.setLevel(logging.DEBUG)
 images_logger.setLevel(logging.DEBUG)
 
 # create file handlers
-events_file_handler = logging.FileHandler(log_dir + 'events.log')
-sensor_file_handler = logging.FileHandler(log_dir + 'sensor.log')
-images_file_handler = logging.FileHandler(log_dir + 'images.log')
+events_file_handler = logging.FileHandler(os.path.join(log_dir, 'events.log'))
+sensor_file_handler = logging.FileHandler(os.path.join(log_dir, 'sensor.log'))
+images_file_handler = logging.FileHandler(os.path.join(log_dir, 'images.log'))
 
 # set file handler logging levels
 events_file_handler.setLevel(logging.DEBUG)
