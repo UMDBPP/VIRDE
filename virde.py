@@ -109,9 +109,9 @@ events_logger.info('Started logging')
 
 while time() < start_time + timeout:
     # take sensor measurements every second within the picamera logging interval
-    for second in range(1, picamera_capture_interval - 1):
-        sensor_logger.info(','.join(str(value) for value in get_sensehat_data()))
+    for second in range(1, picamera_capture_interval):
         sleep(1)
+        sensor_logger.info(','.join(str(value) for value in get_sensehat_data()))
         
     with picamera.PiCamera() as camera:
         # set to maximum v2 resolution
@@ -119,7 +119,7 @@ while time() < start_time + timeout:
         
         # let automatic exposure settle for 2 seconds
         sleep(1)
-        sensor_logger.info(get_sensehat_data())
+        sensor_logger.info(','.join(str(value) for value in get_sensehat_data()))
         sleep(1)
 
         # capture PNG image after processing
