@@ -152,4 +152,4 @@ while time() < start_time + timeout:
             images_logger.info(image_name)
 
 # log script completion
-events_logger('Finished logging')
+events_logger.info('Finished logging')
