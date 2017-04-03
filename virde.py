@@ -60,9 +60,9 @@ sensor_file_handler.setLevel(logging.INFO)
 images_file_handler.setLevel(logging.INFO)
 
 # add formatters to the file handlers
-events_file_handler.setFormatter(FormatterWithHeader(header='DateTime,Message', fmt='%(asctime)s,%(message)s'))
-sensor_file_handler.setFormatter(FormatterWithHeader(header='DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z', fmt='%(asctime)s,%(message)s'))
-images_file_handler.setFormatter(FormatterWithHeader(header='DateTime,ImagePath', fmt='%(asctime)s,%(message)s'))
+events_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
+sensor_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
+images_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
 
 # add file handlers to the loggers
 events_logger.addHandler(events_file_handler)
@@ -70,7 +70,9 @@ sensor_logger.addHandler(sensor_file_handler)
 images_logger.addHandler(images_file_handler)
 
 # add headers to log files
-#print('DateTime,Message')
+print('DateTime,Message', file = log_dir + 'events.log')
+print('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z', file = log_dir + 'sensor.log')
+print('DateTime,ImagePath', file = log_dir + 'images.log')
 
 # define function to return a csv line of all sensehat data
 def get_sensehat_data():
