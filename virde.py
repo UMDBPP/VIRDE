@@ -39,7 +39,15 @@ class FormatterWithHeader(logging.Formatter):
         self.format = super().format
         return self.header + "\n" + self.format(record)
 
-# create loggers to log script events
+# add headers to log files
+with open(log_dir + 'events.log', 'w') as events_log:
+    events_log.write('DateTime,Message')
+with open(log_dir + 'sensor.log', 'w') as sensor_log:
+    sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z')
+with open(log_dir + 'images.log', 'w') as images_log:
+    images_log.write('DateTime,ImagePath')
+    
+# create loggers
 events_logger = logging.getLogger('events')
 sensor_logger = logging.getLogger('sensor')
 images_logger = logging.getLogger('images')
@@ -68,11 +76,6 @@ images_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
 events_logger.addHandler(events_file_handler)
 sensor_logger.addHandler(sensor_file_handler)
 images_logger.addHandler(images_file_handler)
-
-# add headers to log files
-print('DateTime,Message', file = log_dir + 'events.log')
-print('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z', file = log_dir + 'sensor.log')
-print('DateTime,ImagePath', file = log_dir + 'images.log')
 
 # define function to return a csv line of all sensehat data
 def get_sensehat_data():
