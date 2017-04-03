@@ -123,7 +123,7 @@ while time() < start_time + timeout:
         sleep(1)
 
         # capture PNG image after processing
-        image_name = os.path.join(log_dir, 'image_' + str(int(time())), '.png')
+        image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
         camera.capture(image_name)
         images_logger.info(image_name)
 
