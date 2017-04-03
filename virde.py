@@ -20,7 +20,7 @@ start_time = time()
 timeout = 20
 
 # define path to log directory
-log_dir = os.path.join('~/Desktop', 'virde_log', 'log_' + str(int(start_time)))
+log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + str(int(start_time)))
 
 # create path to log directory if it doesn't exist
 if not os.path.exists(log_dir):
