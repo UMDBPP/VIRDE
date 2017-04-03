@@ -140,7 +140,7 @@ def picamera_logging_thread():
                     output.tofile(binary_file)
             
                 # log image save
-                print('Saved Bayer data to ' + image_name)
+                logger.info('Saved Bayer data to ' + image_name)
         
         # delay the specified interval
         sleep(picamera_logging_interval)
