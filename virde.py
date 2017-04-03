@@ -133,13 +133,14 @@ def picamera_logging_thread():
                 camera.capture(stream, 'jpeg', bayer = True)
                 
                 # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
-                with (stream.demosaic() >> 2).astype(numpy.uint8) as output:
-                    # save to file
-                    with open(image_name, 'wb') as binary_file:
-                        output.tofile(binary_file)
+                output = (stream.demosaic() >> 2).astype(numpy.uint8)
                 
-                    # log image save
-                    print('Saved ' + output.array.shape[1] + 'x' + output.array.shape[0] + ' Bayer data to ' + image_name)
+                # save to file
+                with open(image_name, 'wb') as binary_file:
+                    output.tofile(binary_file)
+            
+                # log image save
+                print('Saved ' + output.array.shape[1] + 'x' + output.array.shape[0] + ' Bayer data to ' + image_name)
         
         # delay the specified interval
         sleep(picamera_logging_interval)
