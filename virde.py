@@ -148,8 +148,8 @@ while time() < start_time + timeout:
             with open(image_name, 'wb') as binary_file:
                 output.tofile(binary_file)
         
-            # log image save
-            images_logger.info(image_name)
+        # log image save
+        images_logger.info(image_name)
 
 # log script completion
 events_logger.info('Finished logging')
