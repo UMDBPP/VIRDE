@@ -114,32 +114,32 @@ def picamera_logging_thread():
             #sleep(2)
 
             # capture PNG image            
-            #with (image_dir + '/' + 'image_' + str(int(time())) + '.png') as image_name:
-            #    camera.capture(image_name)
+            #image_name = os.path.join(image_dir, 'image_' + str(int(time())), '.png')
+            #camera.capture(image_name)
             #logger.info('Saved image ' + image_name)
 
             # capture unencoded RGB directly to binary file
-            with (image_dir + '/' + 'rgb_' + str(int(time())) + '.rgb') as image_name:
-                with open(image_name, 'wb') as binary_file:
-                    camera.capture(binary_file, 'rgb')
-                
-                # log image save
-                logger.info('Saved rgb data to ' + image_name)
+            image_name = os.path.join(image_dir, 'rgb_' + str(int(time())), '.rgb')
+            with open(image_name, 'wb') as binary_file:
+                camera.capture(binary_file, 'rgb')
+            
+            # log image save
+            logger.info('Saved rgb data to ' + image_name)
 
             # capture Bayer data to binary file after demosaicing
-            with (image_dir + '/' + 'rgb_bayer_' + str(int(time())) + '.rgb') as image_name:
-                with picamera.array.PiBayerArray(camera) as stream:
-                    # capture to stream as bayer data
-                    camera.capture(stream, 'jpeg', bayer = True)
-                    
-                    # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
-                    with (stream.demosaic() >> 2).astype(numpy.uint8) as output:
-                        # save to file
-                        with open(image_name, 'wb') as binary_file:
-                            output.tofile(binary_file)
-                    
-                        # log image save
-                        print('Saved ' + output.array.shape[1] + 'x' + output.array.shape[0] + ' Bayer data to ' + image_name + '_bayer.rgb')
+            image_name = os.path.join(image_dir, 'rgb_bayer_' + str(int(time())), '.rgb')
+            with picamera.array.PiBayerArray(camera) as stream:
+                # capture to stream as bayer data
+                camera.capture(stream, 'jpeg', bayer = True)
+                
+                # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
+                with (stream.demosaic() >> 2).astype(numpy.uint8) as output:
+                    # save to file
+                    with open(image_name, 'wb') as binary_file:
+                        output.tofile(binary_file)
+                
+                    # log image save
+                    print('Saved ' + output.array.shape[1] + 'x' + output.array.shape[0] + ' Bayer data to ' + image_name + '_bayer.rgb')
         
         # delay the specified interval
         sleep(picamera_logging_interval)
