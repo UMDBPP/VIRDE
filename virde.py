@@ -14,10 +14,10 @@ from sense_hat import SenseHat
 sensehat = SenseHat()
 
 # define interval in seconds between each image capture
-picamera_capture_interval = 5
+picamera_capture_interval = 3
 
 start_time = time()
-timeout = 20
+timeout = 30
 
 # define path to log directory
 log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + str(int(start_time)))
@@ -41,11 +41,11 @@ class FormatterWithHeader(logging.Formatter):
 
 # add headers to log files
 with open(os.path.join(log_dir, 'events.log'), 'w') as events_log:
-    events_log.write('DateTime,Message')
+    events_log.write('DateTime,Message' + '\n')
 with open(os.path.join(log_dir, 'sensor.log'), 'w') as sensor_log:
-    sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z')
+    sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z' + '\n')
 with open(os.path.join(log_dir, 'images.log'), 'w') as images_log:
-    images_log.write('DateTime,ImagePath')
+    images_log.write('DateTime,ImagePath' + '\n')
     
 # create loggers
 events_logger = logging.getLogger('events')
