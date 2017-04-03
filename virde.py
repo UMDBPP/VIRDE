@@ -128,12 +128,12 @@ while time() < start_time + timeout:
         images_logger.info(image_name)
 
         # capture unencoded RGB directly to binary file
-        #image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.data')
-        #with open(image_name, 'wb') as binary_file:
-        #    camera.capture(binary_file, 'rgb')
+        image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.data')
+        with open(image_name, 'wb') as binary_file:
+            camera.capture(binary_file, 'rgb')
         
         # log image save
-        #images_logger.info(image_name)
+        images_logger.info(image_name)
 
         # capture Bayer data to binary file after demosaicing
         image_name = os.path.join(log_dir, 'rgb_bayer_' + str(int(time())) + '.data')
