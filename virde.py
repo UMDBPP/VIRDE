@@ -78,7 +78,7 @@ sensor_logger.addHandler(sensor_file_handler)
 images_logger.addHandler(images_file_handler)
 
 # define function to return a csv line of all sensehat data
-def get_sensehat_data():
+def get_sensehat_data_csv():
     output_data = []
 
     output_data.append(sensehat.get_temperature_from_humidity())
@@ -98,8 +98,8 @@ def get_sensehat_data():
     gyroscope = sensehat.get_gyroscope_raw()
     output_data.extend([gyroscope['x'], gyroscope['y'], gyroscope['z']])
 
-    # return output data
-    return output_data
+    # return output data in CSV format
+    return ','.join(str(value) for value in output_data)
 
 # define starting time for thread completion
 start_time = time()
@@ -111,7 +111,7 @@ while time() < start_time + timeout:
     # take sensor measurements every second within the picamera logging interval
     for second in range(1, picamera_capture_interval):
         sleep(1)
-        sensor_logger.info(','.join(str(value) for value in get_sensehat_data()))
+        sensor_logger.info(get_sensehat_data_csv())
         
     with picamera.PiCamera() as camera:
         # set to maximum v2 resolution
@@ -119,7 +119,7 @@ while time() < start_time + timeout:
         
         # let automatic exposure settle for 2 seconds
         sleep(1)
-        sensor_logger.info(','.join(str(value) for value in get_sensehat_data()))
+        sensor_logger.info(get_sensehat_data_csv())
         sleep(1)
 
         # capture PNG image after processing
