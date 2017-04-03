@@ -60,9 +60,9 @@ sensor_file_handler.setLevel(logging.INFO)
 images_file_handler.setLevel(logging.INFO)
 
 # add formatters to the file handlers
-events_file_handler.setFormatter(FormatterWithHeader(header='DateTime,Message', '%(asctime)s,%(message)s'))
-sensor_file_handler.setFormatter(FormatterWithHeader(header='DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z', '%(asctime)s,%(message)s'))
-images_file_handler.setFormatter(FormatterWithHeader(header='DateTime,ImagePath', '%(asctime)s,%(message)s'))
+events_file_handler.setFormatter(FormatterWithHeader(header='DateTime,Message', fmt='%(asctime)s,%(message)s'))
+sensor_file_handler.setFormatter(FormatterWithHeader(header='DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z', fmt='%(asctime)s,%(message)s'))
+images_file_handler.setFormatter(FormatterWithHeader(header='DateTime,ImagePath', fmt='%(asctime)s,%(message)s'))
 
 # add file handlers to the loggers
 events_logger.addHandler(events_file_handler)
