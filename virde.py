@@ -124,7 +124,7 @@ def picamera_logging_thread():
                 camera.capture(binary_file, 'rgb')
             
             # log image save
-            logger.info('Saved rgb data to ' + image_name)
+            logger.info('Saved RGB data to ' + image_name)
 
             # capture Bayer data to binary file after demosaicing
             image_name = os.path.join(image_dir, 'rgb_bayer_' + str(int(time())) + '.rgb')
@@ -140,7 +140,7 @@ def picamera_logging_thread():
                     output.tofile(binary_file)
             
                 # log image save
-                print('Saved ' + output.array.shape[1] + 'x' + output.array.shape[0] + ' Bayer data to ' + image_name)
+                print('Saved Bayer data to ' + image_name)
         
         # delay the specified interval
         sleep(picamera_logging_interval)
