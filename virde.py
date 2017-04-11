@@ -13,9 +13,6 @@ from sense_hat import SenseHat
 
 sensehat = SenseHat()
 
-# define interval in seconds between each image capture
-picamera_capture_interval = 3
-
 start_time = time()
 timeout = 30
 
@@ -103,21 +100,22 @@ start_time = time()
 # log script start
 events_logger.info('Started logging')
 
-while time() < start_time + timeout:
-    with picamera.PiCamera() as camera:
+# note that camera takes about 13 seconds to initialize
+with picamera.PiCamera() as camera:
+    while time() < start_time + timeout:
         # set to maximum v2 resolution
         camera.resolution = (3280, 2464)
                   
         # let automatic exposure settle for 2 seconds
         sleep_while_logging(2)
 
-        # capture PNG image after processing
-        image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
-        camera.capture(image_name)
-        
-        # log image save
-        images_logger.info(image_name)
-        events_logger.debug('Captured PNG image')
+#         # capture PNG image after processing
+#         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
+#         camera.capture(image_name)
+#         
+#         # log image save
+#         images_logger.info(image_name)
+#         events_logger.debug('Captured PNG image')
 
         # let automatic exposure settle for 2 seconds
         #sleep_while_logging(2)
@@ -150,8 +148,6 @@ while time() < start_time + timeout:
 #         # log image save
 #         images_logger.info(image_name)
 #         events_logger.debug('Captured Bayer image')
-
-    sleep_while_logging(picamera_capture_interval - 2)
 
 # log script completion
 events_logger.info('Finished logging')
