@@ -97,16 +97,17 @@ def sleep_while_logging(seconds):
         events_logger.debug('Appended line to sensor log')
         sleep(1)
 
-# define starting time for thread completion
+# define starting time
 start_time = time()
 
 # log script start
 events_logger.info('Started logging')
 
-with picamera.PiCamera() as camera:
-    # set to maximum v2 resolution
-    camera.resolution = (3280, 2464)
-    while time() < start_time + timeout:              
+while time() < start_time + timeout:
+    with picamera.PiCamera() as camera:
+        # set to maximum v2 resolution
+        camera.resolution = (3280, 2464)
+                  
         # let automatic exposure settle for 2 seconds
         sleep_while_logging(2)
 
@@ -119,7 +120,7 @@ with picamera.PiCamera() as camera:
         events_logger.debug('Captured PNG image')
 
         # let automatic exposure settle for 2 seconds
-        sleep_while_logging(2)
+        #sleep_while_logging(2)
         
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.bip')
@@ -130,25 +131,27 @@ with picamera.PiCamera() as camera:
         images_logger.info(image_name)
         events_logger.debug('Captured RGB image')
 
-        # let automatic exposure settle for 2 seconds
-        sleep_while_logging(2)
-        
-        # capture Bayer data to binary file after demosaicing
-        image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
-        with picamera.array.PiBayerArray(camera) as stream:
-            # capture to stream as bayer data
-            camera.capture(stream, 'jpeg', bayer=True)
-            
-            # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
-            output = (stream.demosaic() >> 2).astype(numpy.uint8)
-            
-            # save to file
-            with open(image_name, 'wb') as binary_file:
-                output.tofile(binary_file)
-        
-        # log image save
-        images_logger.info(image_name)
-        events_logger.debug('Captured Bayer image')
+#         # let automatic exposure settle for 2 seconds
+#         sleep_while_logging(2)
+#          
+#         # capture Bayer data to binary file after demosaicing
+#         image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
+#         with picamera.array.PiBayerArray(camera) as stream:
+#             # capture to stream as bayer data
+#             camera.capture(stream, 'jpeg', bayer=True)
+#              
+#             # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
+#             output = (stream.demosaic() >> 2).astype(numpy.uint8)
+#              
+#             # save to file
+#             with open(image_name, 'wb') as binary_file:
+#                 output.tofile(binary_file)
+#          
+#         # log image save
+#         images_logger.info(image_name)
+#         events_logger.debug('Captured Bayer image')
+
+    sleep_while_logging(picamera_capture_interval - 2)
 
 # log script completion
 events_logger.info('Finished logging')
