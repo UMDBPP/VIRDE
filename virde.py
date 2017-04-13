@@ -14,7 +14,8 @@ from sense_hat import SenseHat
 sensehat = SenseHat()
 
 start_time = time()
-timeout = 30
+timeout = 60 * 60
+picamera_interval = 10
 
 # define path to log directory
 log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + str(int(start_time)))
@@ -30,7 +31,7 @@ with open(os.path.join(log_dir, 'sensor.log'), 'w') as sensor_log:
     sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z' + '\n')
 with open(os.path.join(log_dir, 'images.log'), 'w') as images_log:
     images_log.write('DateTime,ImagePath' + '\n')
-    
+
 # create loggers
 events_logger = logging.getLogger('events')
 sensor_logger = logging.getLogger('sensor')
@@ -94,57 +95,59 @@ def sleep_while_logging(seconds):
         events_logger.debug('Appended line to sensor log')
         sleep(1)
 
-# define starting time
-start_time = time()
-
 # log script start
 events_logger.info('Started logging')
 
 # note that camera takes about 13 seconds to initialize
 with picamera.PiCamera() as camera:
+    # define starting time
+    start_time = time()
+
+    sleep_while_logging(2)
+
     while time() < start_time + timeout:
         # set to maximum v2 resolution
         camera.resolution = (3280, 2464)
-                  
+
         # let automatic exposure settle for 2 seconds
-        sleep_while_logging(2)
+        sleep_while_logging(picamera_interval)
 
 #         # capture PNG image after processing
 #         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
 #         camera.capture(image_name)
-#         
+#
 #         # log image save
 #         images_logger.info(image_name)
 #         events_logger.debug('Captured PNG image')
-# 
+#
 #         # let automatic exposure settle for 2 seconds
 #         sleep_while_logging(2)
-        
+
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.bip')
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
-        
+
         # log image save
         images_logger.info(image_name)
         events_logger.debug('Captured RGB image in BIP format (3296x2464 pixels)')
 
 #         # let automatic exposure settle for 2 seconds
 #         sleep_while_logging(2)
-#          
+#
 #         # capture Bayer data to binary file after demosaicing
 #         image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
 #         with picamera.array.PiBayerArray(camera) as stream:
 #             # capture to stream as bayer data
 #             camera.capture(stream, 'jpeg', bayer=True)
-#              
+#
 #             # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
 #             output = (stream.demosaic() >> 2).astype(numpy.uint8)
-#              
+#
 #             # save to file
 #             with open(image_name, 'wb') as binary_file:
 #                 output.tofile(binary_file)
-#          
+#
 #         # log image save
 #         images_logger.info(image_name)
 #         events_logger.debug('Captured Bayer data in BIP format (3280x2464 pixels)')
