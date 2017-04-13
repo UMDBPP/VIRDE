@@ -116,9 +116,9 @@ with picamera.PiCamera() as camera:
 #         # log image save
 #         images_logger.info(image_name)
 #         events_logger.debug('Captured PNG image')
-
-        # let automatic exposure settle for 2 seconds
-        #sleep_while_logging(2)
+# 
+#         # let automatic exposure settle for 2 seconds
+#         sleep_while_logging(2)
         
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.bip')
@@ -127,7 +127,7 @@ with picamera.PiCamera() as camera:
         
         # log image save
         images_logger.info(image_name)
-        events_logger.debug('Captured RGB image')
+        events_logger.debug('Captured RGB image in BIP format (3296x2464 pixels)')
 
 #         # let automatic exposure settle for 2 seconds
 #         sleep_while_logging(2)
@@ -147,7 +147,7 @@ with picamera.PiCamera() as camera:
 #          
 #         # log image save
 #         images_logger.info(image_name)
-#         events_logger.debug('Captured Bayer image')
+#         events_logger.debug('Captured Bayer data in BIP format (3280x2464 pixels)')
 
 # log script completion
 events_logger.info('Finished logging')
