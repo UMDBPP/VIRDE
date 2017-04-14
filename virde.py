@@ -1,9 +1,7 @@
-# modified from https://www.raspberrypi.org/learning/sense-hat-data-logger/code/Sense_Logger_v4.py
+# modified from https://www.raspberrypi.org/learning/sense-hat-data-debug_logger/code/Sense_Logger_v4.py
 
 # package imports
 import os
-from datetime import datetime
-from threading import Thread
 from time import sleep, time
 import logging
 import numpy
@@ -15,64 +13,66 @@ from sense_hat import SenseHat
 
 sensehat = SenseHat()
 
-# define logging intervals in seconds
-sensehat_logging_interval = 1
-picamera_logging_interval = 2
-
+# define starting time
 start_time = time()
-timeout = 10
+
+# average flight time is 98.92 minutes
+timeout = 60 * 100
+
+# define camera capture interval in seconds
+picamera_interval = 60
+
+if picamera_interval <= 15:
+    picamera_interval = 15
 
 # define path to log directory
-log_dir = '/home/pi/Desktop/virde_log/'
-
-# create logger to log all escalated at and above INFO
-logger = logging.getLogger('events logger')
-logger.setLevel(logging.DEBUG)
-
-# add a file handler
-file_handler = logging.FileHandler(log_dir + 'events_log_' + str(int(start_time)) + '.csv')
-file_handler.setLevel(logging.DEBUG)  # ensure all messages are logged to file
-
-# create a formatter and set the formatter for the handler.
-formatter = logging.Formatter('%(asctime)s,%(levelname)s,%(message)s')
-file_handler.setFormatter(formatter)
-
-# add the Handler to the logger
-logger.addHandler(file_handler)
+log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + str(int(start_time)))
 
 # create path to log directory if it doesn't exist
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
-# define image directory
-image_dir = os.path.join(log_dir, 'images_' + str(int(start_time)))
+# add headers to log files
+with open(os.path.join(log_dir, 'events.log'), 'w') as events_log:
+    events_log.write('DateTime,Message' + '\n')
+with open(os.path.join(log_dir, 'sensor.log'), 'w') as sensor_log:
+    sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z' + '\n')
+with open(os.path.join(log_dir, 'images.log'), 'w') as images_log:
+    images_log.write('DateTime,ImagePath' + '\n')
 
-# create image directory if it doesn't exist
-if not os.path.exists(image_dir):
-    os.mkdir(image_dir)
+# create loggers
+events_logger = logging.getLogger('events')
+sensor_logger = logging.getLogger('sensor')
+images_logger = logging.getLogger('images')
 
-# append datetime to filename and open logfile with append connection
-sensor_log_filename = os.path.join(log_dir, 'sensor_log_' + str(int(start_time)) + '.csv')
-logger.info('Created sensor log at ' + sensor_log_filename)
+# set logging levels
+events_logger.setLevel(logging.DEBUG)
+sensor_logger.setLevel(logging.INFO)
+images_logger.setLevel(logging.INFO)
 
-# construct CSV header
-header = ['datetime']
-header.append('temp_h')
-header.append('temp_p')
-header.append('humidity')
-header.append('pressure')
-header.extend(['pitch', 'roll', 'yaw'])
-header.extend(['mag_x', 'mag_y', 'mag_z'])
-header.extend(['accel_x', 'accel_y', 'accel_z'])
-header.extend(['gyro_x', 'gyro_y', 'gyro_z'])
+# create file handlers
+events_file_handler = logging.FileHandler(os.path.join(log_dir, 'events.log'))
+sensor_file_handler = logging.FileHandler(os.path.join(log_dir, 'sensor.log'))
+images_file_handler = logging.FileHandler(os.path.join(log_dir, 'images.log'))
 
-# write header to file
-with open(sensor_log_filename, 'w') as sensor_log:
-    sensor_log.write(','.join(str(value) for value in header) + '\n')
+# set file handler logging levels
+events_file_handler.setLevel(logging.DEBUG)
+sensor_file_handler.setLevel(logging.DEBUG)
+images_file_handler.setLevel(logging.DEBUG)
+
+# add formatters to the file handlers
+events_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(levelname)s,%(message)s'))
+sensor_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
+images_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
+
+# add file handlers to the loggers
+events_logger.addHandler(events_file_handler)
+sensor_logger.addHandler(sensor_file_handler)
+images_logger.addHandler(images_file_handler)
 
 # define function to return a csv line of all sensehat data
-def get_sensehat_csv_line():
-    output_data = [datetime.now()]
+def get_sensehat_data_csv():
+    output_data = []
 
     output_data.append(sensehat.get_temperature_from_humidity())
     output_data.append(sensehat.get_temperature_from_pressure())
@@ -91,66 +91,74 @@ def get_sensehat_csv_line():
     gyroscope = sensehat.get_gyroscope_raw()
     output_data.extend([gyroscope['x'], gyroscope['y'], gyroscope['z']])
 
-    # return output data in comma separated form
+    # log sensor read
+    events_logger.debug('Accessed sensor data')
+
+    # return output data in CSV format
     return ','.join(str(value) for value in output_data)
 
-def sensehat_logging_thread():
-    logger.info('Started sensor logging thread')
-    while time() < start_time + timeout:
-        with open(sensor_log_filename, 'a') as sensor_log:
-            sensor_log.write(get_sensehat_csv_line() + '\n')
-        logger.info('Appended line to ' + sensor_log_filename)
-        sleep(sensehat_logging_interval)
-    logger.info('Stopped sensor logging thread')
-      
-def picamera_logging_thread():
-    logger.info('Started camera logging thread')
-    while time() < start_time + timeout:
-        with picamera.PiCamera() as camera:
-            # set to maximum v2 resolution
-            camera.resolution = (3280, 2464)
-            
-            # let automatic exposure settle
-            #sleep(2)
+def sleep_while_logging(seconds):
+    for second in range(1, seconds + 1):
+        sensor_logger.info(get_sensehat_data_csv())
+        events_logger.debug('Appended line to sensor log')
+        sleep(1)
 
-            # capture PNG image            
-            #image_name = os.path.join(image_dir, 'image_' + str(int(time())), '.png')
-            #camera.capture(image_name)
-            #logger.info('Saved image ' + image_name)
+# log script start
+events_logger.info('Started logging')
 
-            # capture unencoded RGB directly to binary file
-            image_name = os.path.join(image_dir, 'rgb_' + str(int(time())) + '.rgb')
-            with open(image_name, 'wb') as binary_file:
-                camera.capture(binary_file, 'rgb')
-            
-            # log image save
-            logger.info('Saved RGB data to ' + image_name)
-
-            # capture Bayer data to binary file after demosaicing
-            image_name = os.path.join(image_dir, 'rgb_bayer_' + str(int(time())) + '.rgb')
-            with picamera.array.PiBayerArray(camera) as stream:
-                # capture to stream as bayer data
-                camera.capture(stream, 'jpeg', bayer = True)
-                
-                # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
-                output = (stream.demosaic() >> 2).astype(numpy.uint8)
-                
-                # save to file
-                with open(image_name, 'wb') as binary_file:
-                    output.tofile(binary_file)
-            
-                # log image save
-                logger.info('Saved Bayer data to ' + image_name)
-        
-        # delay the specified interval
-        sleep(picamera_logging_interval)
-
-    # log camera thread completion
-    logger.info('Stopped camera logging thread')
-
-# define starting time for thread completion
+# define starting time
 start_time = time()
 
-# start logging threads
-Thread(target = sensehat_logging_thread).start()
-Thread(target = picamera_logging_thread).start()
+while time() < start_time + timeout:
+    # note that camera takes about 13 seconds to initialize
+    with picamera.PiCamera() as camera:
+        # set to maximum v2 resolution
+        camera.resolution = (3280, 2464)
+        
+        # let automatic exposure settle for 2 seconds
+        sleep_while_logging(2)
+
+#         # capture PNG image after processing
+#         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
+#         camera.capture(image_name)
+# 
+#         # log image save
+#         images_logger.info(image_name)
+#         events_logger.debug('Captured PNG image')
+# 
+#         # let automatic exposure settle for 2 seconds
+#         sleep_while_logging(2)
+
+        # capture unencoded RGB directly to binary file
+        image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.bip')
+        with open(image_name, 'wb') as binary_file:
+            camera.capture(binary_file, 'rgb')
+
+        # log image save
+        images_logger.info(image_name)
+        events_logger.debug('Captured RGB image in BIP format (3296x2464 pixels)')
+
+#         # let automatic exposure settle for 2 seconds
+#         sleep_while_logging(2)
+#
+#         # capture Bayer data to binary file after demosaicing
+#         image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
+#         with picamera.array.PiBayerArray(camera) as stream:
+#             # capture to stream as bayer data
+#             camera.capture(stream, 'jpeg', bayer=True)
+#
+#             # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
+#             output = (stream.demosaic() >> 2).astype(numpy.uint8)
+#
+#             # save to file
+#             with open(image_name, 'wb') as binary_file:
+#                 output.tofile(binary_file)
+#
+#         # log image save
+#         images_logger.info(image_name)
+#         events_logger.debug('Captured Bayer data in BIP format (3280x2464 pixels)')
+
+    sleep_while_logging(picamera_interval - 15)
+
+# log script completion
+events_logger.info('Finished logging')
