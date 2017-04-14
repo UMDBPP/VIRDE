@@ -17,7 +17,7 @@ sensehat = SenseHat()
 start_time = time()
 
 # average flight time is 98.92 minutes
-timeout = 60 * 100
+timeout = 60 * 110
 
 # define camera capture interval in seconds
 picamera_interval = 60
