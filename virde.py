@@ -16,7 +16,7 @@ sensehat = SenseHat()
 # define starting time
 start_time = time()
 
-# average flight time is 100 minutes
+# average flight time is 98.92 minutes
 timeout = 60 * 100
 
 # define camera capture interval in seconds
