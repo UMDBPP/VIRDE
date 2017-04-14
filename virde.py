@@ -13,9 +13,17 @@ from sense_hat import SenseHat
 
 sensehat = SenseHat()
 
+# define starting time
 start_time = time()
-timeout = 60 * 60
-picamera_interval = 10
+
+# average flight time is 100 minutes
+timeout = 60 * 100
+
+# define camera capture interval in seconds
+picamera_interval = 60
+
+if picamera_interval <= 15:
+    picamera_interval = 15
 
 # define path to log directory
 log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + str(int(start_time)))
@@ -98,28 +106,26 @@ def sleep_while_logging(seconds):
 # log script start
 events_logger.info('Started logging')
 
-# note that camera takes about 13 seconds to initialize
-with picamera.PiCamera() as camera:
-    # define starting time
-    start_time = time()
+# define starting time
+start_time = time()
 
-    sleep_while_logging(2)
-
-    while time() < start_time + timeout:
+while time() < start_time + timeout:
+    # note that camera takes about 13 seconds to initialize
+    with picamera.PiCamera() as camera:
         # set to maximum v2 resolution
         camera.resolution = (3280, 2464)
-
+        
         # let automatic exposure settle for 2 seconds
-        sleep_while_logging(picamera_interval)
+        sleep_while_logging(2)
 
 #         # capture PNG image after processing
 #         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
 #         camera.capture(image_name)
-#
+# 
 #         # log image save
 #         images_logger.info(image_name)
 #         events_logger.debug('Captured PNG image')
-#
+# 
 #         # let automatic exposure settle for 2 seconds
 #         sleep_while_logging(2)
 
@@ -151,6 +157,8 @@ with picamera.PiCamera() as camera:
 #         # log image save
 #         images_logger.info(image_name)
 #         events_logger.debug('Captured Bayer data in BIP format (3280x2464 pixels)')
+
+    sleep_while_logging(picamera_interval - 15)
 
 # log script completion
 events_logger.info('Finished logging')
