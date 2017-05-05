@@ -17,14 +17,11 @@ sensehat = SenseHat()
 # define camera capture interval
 picamera_capture_interval = 20
 
-# define starting time
-start_time = time()
-
 # average flight time is 98.92 minutes
 timeout = 60 * 110
 
 # define path to log directory
-log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + str(int(start_time)))
+log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + strftime("%Y%m%d_%H%M%S_%Z"))
 
 # create path to log directory if it doesn't exist
 if not os.path.exists(log_dir):
@@ -115,7 +112,7 @@ with picamera.PiCamera() as camera:
     # continue until timeout is exceeded
     while time() < start_time + timeout:       
 #         # capture PNG image after processing
-#         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
+#         image_name = os.path.join(log_dir, 'image_' + strftime("%Y%m%d_%H%M%S_%Z") + '.png')
 #         camera.capture(image_name)
 #  
 #         # log image save
@@ -123,7 +120,7 @@ with picamera.PiCamera() as camera:
 #         events_logger.info('Captured PNG image')
 
         # capture unencoded RGB directly to binary file
-        image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.bip')
+        image_name = os.path.join(log_dir, 'rgb_' + strftime("%Y%m%d_%H%M%S_%Z") + '.bip')
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
 
@@ -135,7 +132,7 @@ with picamera.PiCamera() as camera:
         sleep_while_logging(picamera_capture_interval / 2)
 
         # capture Bayer data to binary file (after demosaicing)
-        image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
+        image_name = os.path.join(log_dir, 'bayer_' + strftime("%Y%m%d_%H%M%S_%Z") + '.bip')
         with picamera.array.PiBayerArray(camera) as stream:
             # capture to stream as bayer data
             camera.capture(stream, 'jpeg', bayer=True)
