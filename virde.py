@@ -2,7 +2,7 @@
 
 # package imports
 import os
-from time import sleep, time
+import time
 from datetime import datetime, timedelta
 import logging
 import numpy
