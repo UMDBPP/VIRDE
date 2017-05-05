@@ -2,7 +2,7 @@
 
 # package imports
 import os
-import time
+from time import sleep, time, strftime
 from datetime import datetime, timedelta
 import logging
 import numpy
@@ -56,9 +56,9 @@ sensor_file_handler.setLevel(logging.DEBUG)
 images_file_handler.setLevel(logging.DEBUG)
 
 # add formatters to the file handlers
-events_file_handler.setFormatter(logging.Formatter(time.strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
-sensor_file_handler.setFormatter(logging.Formatter(time.strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
-images_file_handler.setFormatter(logging.Formatter(time.strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
+events_file_handler.setFormatter(logging.Formatter(strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
+sensor_file_handler.setFormatter(logging.Formatter(strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
+images_file_handler.setFormatter(logging.Formatter(strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
 
 # add file handlers to the loggers
 events_logger.addHandler(events_file_handler)
