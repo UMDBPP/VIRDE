@@ -3,6 +3,7 @@
 # package imports
 import os
 from time import sleep, time
+from datetime import datetime, timedelta
 import logging
 import numpy
 
@@ -18,12 +19,6 @@ start_time = time()
 
 # average flight time is 98.92 minutes
 timeout = 60 * 110
-
-# define camera capture interval in seconds
-picamera_interval = 60
-
-if picamera_interval <= 15:
-    picamera_interval = 15
 
 # define path to log directory
 log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + str(int(start_time)))
@@ -61,9 +56,9 @@ sensor_file_handler.setLevel(logging.DEBUG)
 images_file_handler.setLevel(logging.DEBUG)
 
 # add formatters to the file handlers
-events_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(levelname)s,%(message)s'))
-sensor_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
-images_file_handler.setFormatter(logging.Formatter('%(asctime)s,%(message)s'))
+events_file_handler.setFormatter(logging.Formatter(time.strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
+sensor_file_handler.setFormatter(logging.Formatter(time.strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
+images_file_handler.setFormatter(logging.Formatter(time.strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
 
 # add file handlers to the loggers
 events_logger.addHandler(events_file_handler)
@@ -97,10 +92,15 @@ def get_sensehat_data_csv():
     # return output data in CSV format
     return ','.join(str(value) for value in output_data)
 
+def log_until_next_minute():
+    # Calculate the delay to the start of the next hour
+    next_hour = (datetime.now() + timedelta(minute=1)).replace(hour=0, second=0, microsecond=0)
+    sleep_while_logging((next_hour - datetime.now()).seconds)
+
 def sleep_while_logging(seconds):
     for second in range(1, seconds + 1):
         sensor_logger.info(get_sensehat_data_csv())
-        events_logger.debug('Appended line to sensor log')
+        events_logger.info('Appended line to sensor log')
         sleep(1)
 
 # log script start
@@ -109,25 +109,24 @@ events_logger.info('Started logging')
 # define starting time
 start_time = time()
 
-while time() < start_time + timeout:
-    # note that camera takes about 13 seconds to initialize
-    with picamera.PiCamera() as camera:
-        # set to maximum v2 resolution
-        camera.resolution = (3280, 2464)
+# note that camera takes about 13 seconds to initialize
+with picamera.PiCamera() as camera:
+    # set to maximum v2 resolution
+    camera.resolution = (3280, 2464)
+    
+    # continue until timeout is exceeded
+    while time() < start_time + timeout:
         
-        # let automatic exposure settle for 2 seconds
-        sleep_while_logging(2)
-
-#         # capture PNG image after processing
-#         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
-#         camera.capture(image_name)
-# 
-#         # log image save
-#         images_logger.info(image_name)
-#         events_logger.debug('Captured PNG image')
-# 
-#         # let automatic exposure settle for 2 seconds
-#         sleep_while_logging(2)
+        # wait until next minute
+        log_until_next_minute()
+        
+        # capture PNG image after processing
+        image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
+        camera.capture(image_name)
+ 
+        # log image save
+        images_logger.info(image_name)
+        events_logger.info('Captured PNG image')
 
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.bip')
@@ -136,29 +135,24 @@ while time() < start_time + timeout:
 
         # log image save
         images_logger.info(image_name)
-        events_logger.debug('Captured RGB image in BIP format (3296x2464 pixels)')
+        events_logger.info('Captured RGB image in BIP format (3296x2464 pixels)')
 
-#         # let automatic exposure settle for 2 seconds
-#         sleep_while_logging(2)
-#
-#         # capture Bayer data to binary file after demosaicing
-#         image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
-#         with picamera.array.PiBayerArray(camera) as stream:
-#             # capture to stream as bayer data
-#             camera.capture(stream, 'jpeg', bayer=True)
-#
-#             # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
-#             output = (stream.demosaic() >> 2).astype(numpy.uint8)
-#
-#             # save to file
-#             with open(image_name, 'wb') as binary_file:
-#                 output.tofile(binary_file)
-#
-#         # log image save
-#         images_logger.info(image_name)
-#         events_logger.debug('Captured Bayer data in BIP format (3280x2464 pixels)')
+        # capture Bayer data to binary file (after demosaicing)
+        image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
+        with picamera.array.PiBayerArray(camera) as stream:
+            # capture to stream as bayer data
+            camera.capture(stream, 'jpeg', bayer=True)
 
-    sleep_while_logging(picamera_interval - 15)
+            # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
+            output = (stream.demosaic() >> 2).astype(numpy.uint8)
+
+            # save to file
+            with open(image_name, 'wb') as binary_file:
+                output.tofile(binary_file)
+
+        # log image save
+        images_logger.info(image_name)
+        events_logger.info('Captured Bayer data in BIP format (3280x2464 pixels)')
 
 # log script completion
 events_logger.info('Finished logging')
