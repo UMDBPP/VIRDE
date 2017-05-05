@@ -110,11 +110,7 @@ with picamera.PiCamera() as camera:
     camera.resolution = (3280, 2464)
     
     # continue until timeout is exceeded
-    while time() < start_time + timeout:
-        
-        # wait for delay time
-        sleep_while_logging(30)
-        
+    while time() < start_time + timeout:       
 #         # capture PNG image after processing
 #         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
 #         camera.capture(image_name)
@@ -132,6 +128,9 @@ with picamera.PiCamera() as camera:
         images_logger.info(image_name)
         events_logger.info('Captured RGB image in BIP format (3296x2464 pixels)')
 
+        # wait for delay time
+        sleep_while_logging(30)
+
         # capture Bayer data to binary file (after demosaicing)
         image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
         with picamera.array.PiBayerArray(camera) as stream:
@@ -148,6 +147,9 @@ with picamera.PiCamera() as camera:
         # log image save
         images_logger.info(image_name)
         events_logger.info('Captured Bayer data in BIP format (3280x2464 pixels)')
+
+        # wait for delay time
+        sleep_while_logging(30)
 
 # log script completion
 events_logger.info('Finished logging')
