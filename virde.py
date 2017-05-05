@@ -94,8 +94,8 @@ def get_sensehat_data_csv():
 
 def log_until_next_minute():
     # Calculate the delay to the start of the next hour
-    next_hour = (datetime.now() + timedelta(minute=1)).replace(hour=0, second=0, microsecond=0)
-    sleep_while_logging((next_hour - datetime.now()).seconds)
+    next_minute = (datetime.now() + timedelta(minutes=1)).replace(hour=0, second=0, microsecond=0)
+    sleep_while_logging((next_minute - datetime.now()).seconds)
 
 def sleep_while_logging(seconds):
     for second in range(1, seconds + 1):
