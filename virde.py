@@ -3,7 +3,7 @@
 # package imports
 import os
 from time import sleep, time, strftime
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 import numpy
 
@@ -92,11 +92,6 @@ def get_sensehat_data_csv():
     # return output data in CSV format
     return ','.join(str(value) for value in output_data)
 
-def log_until_next_minute():
-    # Calculate the delay to the start of the next hour
-    next_minute = (datetime.now() + timedelta(minutes=1)).replace(hour=0, second=0, microsecond=0)
-    sleep_while_logging((next_minute - datetime.now()).seconds)
-
 def sleep_while_logging(seconds):
     for second in range(1, seconds + 1):
         sensor_logger.info(get_sensehat_data_csv())
@@ -117,16 +112,16 @@ with picamera.PiCamera() as camera:
     # continue until timeout is exceeded
     while time() < start_time + timeout:
         
-        # wait until next minute
-        log_until_next_minute()
+        # wait for delay time
+        sleep_while_logging(30)
         
-        # capture PNG image after processing
-        image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
-        camera.capture(image_name)
- 
-        # log image save
-        images_logger.info(image_name)
-        events_logger.info('Captured PNG image')
+#         # capture PNG image after processing
+#         image_name = os.path.join(log_dir, 'image_' + str(int(time())) + '.png')
+#         camera.capture(image_name)
+#  
+#         # log image save
+#         images_logger.info(image_name)
+#         events_logger.info('Captured PNG image')
 
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, 'rgb_' + str(int(time())) + '.bip')
