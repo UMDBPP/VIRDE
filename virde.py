@@ -14,6 +14,9 @@ from sense_hat import SenseHat
 
 sensehat = SenseHat()
 
+# define camera capture interval
+picamera_capture_interval = 20
+
 # define starting time
 start_time = time()
 
@@ -129,7 +132,7 @@ with picamera.PiCamera() as camera:
         events_logger.info('Captured RGB image in BIP format (3296x2464 pixels)')
 
         # wait for delay time
-        sleep_while_logging(30)
+        sleep_while_logging(picamera_capture_interval / 2)
 
         # capture Bayer data to binary file (after demosaicing)
         image_name = os.path.join(log_dir, 'bayer_' + str(int(time())) + '.bip')
@@ -149,7 +152,7 @@ with picamera.PiCamera() as camera:
         events_logger.info('Captured Bayer data in BIP format (3280x2464 pixels)')
 
         # wait for delay time
-        sleep_while_logging(30)
+        sleep_while_logging(picamera_capture_interval / 2)
 
 # log script completion
 events_logger.info('Finished logging')
