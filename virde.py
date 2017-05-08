@@ -110,7 +110,7 @@ with picamera.PiCamera() as camera:
     camera.resolution = (3280, 2464)
     
     # continue until timeout is exceeded
-    while time() < start_time + timeout:       
+    while time() < start_time + timeout:
 #         # capture PNG image after processing
 #         image_name = os.path.join(log_dir, 'image_' + strftime("%Y%m%d_%H%M%S_%Z") + '.png')
 #         camera.capture(image_name)
@@ -120,7 +120,7 @@ with picamera.PiCamera() as camera:
 #         events_logger.info('Captured PNG image')
 
         # capture unencoded RGB directly to binary file
-        image_name = os.path.join(log_dir, 'rgb_' + strftime("%Y%m%d_%H%M%S_%Z") + '.bip')
+        image_name = os.path.join(log_dir, strftime("%Y%m%d_%H%M%S_%Z") + '_rgb_' + '.bip')
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
 
@@ -132,7 +132,7 @@ with picamera.PiCamera() as camera:
         sleep_while_logging(picamera_capture_interval / 2)
 
         # capture Bayer data to binary file (after demosaicing)
-        image_name = os.path.join(log_dir, 'bayer_' + strftime("%Y%m%d_%H%M%S_%Z") + '.bip')
+        image_name = os.path.join(log_dir, strftime("%Y%m%d_%H%M%S_%Z") + '_bayer_' + '.bip')
         with picamera.array.PiBayerArray(camera) as stream:
             # capture to stream as bayer data
             camera.capture(stream, 'jpeg', bayer=True)
