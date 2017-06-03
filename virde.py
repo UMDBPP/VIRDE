@@ -129,27 +129,27 @@ with picamera.PiCamera() as camera:
         events_logger.info('Captured RGB image in BIP format (3296x2464 pixels)')
 
         # wait for delay time
-        sleep_while_logging(picamera_capture_interval / 2)
+        sleep_while_logging(picamera_capture_interval)
 
-        # capture Bayer data to binary file (after demosaicing)
-        image_name = os.path.join(log_dir, strftime("%Y%m%d_%H%M%S_%Z") + '_bayer_' + '.bip')
-        with picamera.array.PiBayerArray(camera) as stream:
-            # capture to stream as bayer data
-            camera.capture(stream, 'jpeg', bayer=True)
-
-            # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
-            output = (stream.demosaic() >> 2).astype(numpy.uint8)
-
-            # save to file
-            with open(image_name, 'wb') as binary_file:
-                output.tofile(binary_file)
-
-        # log image save
-        images_logger.info(image_name)
-        events_logger.info('Captured Bayer data in BIP format (3280x2464 pixels)')
-
-        # wait for delay time
-        sleep_while_logging(picamera_capture_interval / 2)
+#         # capture Bayer data to binary file (after demosaicing)
+#         image_name = os.path.join(log_dir, strftime("%Y%m%d_%H%M%S_%Z") + '_bayer_' + '.bip')
+#         with picamera.array.PiBayerArray(camera) as stream:
+#             # capture to stream as bayer data
+#             camera.capture(stream, 'jpeg', bayer=True)
+# 
+#             # Demosaic data and write to output (just use stream.array if you want to skip the demosaic step)
+#             output = (stream.demosaic() >> 2).astype(numpy.uint8)
+# 
+#             # save to file
+#             with open(image_name, 'wb') as binary_file:
+#                 output.tofile(binary_file)
+# 
+#         # log image save
+#         images_logger.info(image_name)
+#         events_logger.info('Captured Bayer data in BIP format (3280x2464 pixels)')
+# 
+#         # wait for delay time
+#         sleep_while_logging(picamera_capture_interval / 2)
 
 # log script completion
 events_logger.info('Finished logging')
