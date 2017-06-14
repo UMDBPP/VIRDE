@@ -64,7 +64,7 @@ def get_sensehat_data_csv_line():
 
 def append_csv(filename, input_data):
     with open(filename, 'a') as csv_file:
-        csv_file.write(strftime('%Y-%m-%d %H:%M:%S %Z') + ',' + ','.join(str(input_data)) + '\n')
+        csv_file.write(strftime('%Y-%m-%d %H:%M:%S %Z') + ',' + ','.join(" ".join(str(value) for value in input_data)) + '\n')
 
 append_csv(os.path.join(log_dir, 'images.log'), ['Log start'])
 
