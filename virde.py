@@ -63,10 +63,10 @@ def get_sensehat_data_csv_line():
     return ','.join(str(value) for value in output_data)
 
 def append_csv(csv_file, input_data):
-    with csv_file:
+    with open(csv_file, 'a'):
         csv_file.write(strftime('%Y-%m-%d %H:%M:%S %Z') + ',' + ','.join(input_data) + '\n')
 
-append_csv(images_log, ['Log start'])
+append_csv(os.path.join(log_dir, 'images.log'), ['Log start'])
 
 # define starting time
 logging_start_time = time()
@@ -83,7 +83,7 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
 
         # log sensor data
-        append_csv(sensor_log, get_sensehat_data_csv_line())
+        append_csv(os.path.join(log_dir, 'sensor.log'), get_sensehat_data_csv_line())
 
         current_duration = time() - current_start_time
 
@@ -92,7 +92,7 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
         
         # log sensor data
-        append_csv(sensor_log, get_sensehat_data_csv_line())
+        append_csv(os.path.join(log_dir, 'sensor.log'), get_sensehat_data_csv_line())
         
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_rgb_' + '.bip')
@@ -100,7 +100,7 @@ with picamera.PiCamera() as camera:
             camera.capture(binary_file, 'rgb')
 
         # log image save
-        append_csv(images_log, [image_name])
+        append_csv(os.path.join(log_dir, 'images.log'), [image_name])
         
         # get the time it took to capture the most recent image
         current_duration = time() - current_start_time
@@ -112,10 +112,10 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
 
         # log sensor data
-        append_csv(sensor_log, get_sensehat_data_csv_line())
+        append_csv(os.path.join(log_dir, 'images.log'), get_sensehat_data_csv_line())
 
         current_duration = time() - current_start_time
 
         sleep((picamera_capture_interval / 3) - current_duration)
 
-append_csv(images_log, ['Log end'])
+append_csv(os.path.join(log_dir, 'images.log'), ['Log end'])
