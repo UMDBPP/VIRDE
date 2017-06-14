@@ -30,7 +30,7 @@ with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
     camera.resolution = (3280, 2464)
     
-    print("Camera initialized in " + str(time() - current_start_time) + " seconds")
+    print("Camera initialized in " + str(time() - start_time) + " seconds")
     
     # continue until timeout_seconds is exceeded
     while time() < start_time + timeout_seconds:
