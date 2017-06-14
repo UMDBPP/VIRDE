@@ -10,7 +10,7 @@ import picamera.array
 # free space is 24097.036 mB / 23.2 mB -> 988.226721517 images -> 900 images to be safe
 
 # define camera capture interval
-picamera_capture_interval = 20
+picamera_capture_interval = 10
 
 # average flight time is 98.92 minutes, longest ever flight was 175.53 minutes
 timeout_seconds = 60
@@ -30,6 +30,8 @@ with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
     camera.resolution = (3280, 2464)
     
+    print("Camera initialized in " + str(time() - current_start_time) + " seconds")
+    
     # continue until timeout_seconds is exceeded
     while time() < start_time + timeout_seconds:
         current_start_time = time()
@@ -39,7 +41,7 @@ with picamera.PiCamera() as camera:
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
             
-        print("Image taken in " + str(time() - current_start_time) + "seconds")
+        print("Image taken in " + str(time() - current_start_time) + " seconds")
         
         sleep(picamera_capture_interval)
 
