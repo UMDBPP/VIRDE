@@ -14,11 +14,13 @@ from sense_hat import SenseHat
 
 sensehat = SenseHat()
 
-# define camera capture interval
-picamera_capture_interval = 20
+# free space is 24097.036 mB / 23.2 mB -> 988.226721517 images -> 900 images to be safe
 
-# average flight time is 98.92 minutes
-timeout = 60 * 200
+# define camera capture interval
+picamera_capture_interval = 15
+
+# average flight time is 98.92 minutes, longest ever flight was 175.53 minutes
+timeout_seconds = 60 * 200
 
 # define path to log directory
 log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + strftime("%Y%m%d_%H%M%S_%Z"))
@@ -109,8 +111,8 @@ with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
     camera.resolution = (3280, 2464)
     
-    # continue until timeout is exceeded
-    while time() < start_time + timeout:
+    # continue until timeout_seconds is exceeded
+    while time() < start_time + timeout_seconds:
 #         # capture PNG image after processing
 #         image_name = os.path.join(log_dir, 'image_' + strftime("%Y%m%d_%H%M%S_%Z") + '.png')
 #         camera.capture(image_name)
