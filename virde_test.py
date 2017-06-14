@@ -41,8 +41,10 @@ with picamera.PiCamera() as camera:
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
             
-        print("Image taken in " + str(time() - current_start_time) + " seconds")
+        image_capture_time = time() - current_start_time
         
-        sleep(picamera_capture_interval)
+        print("Image taken in " + str(image_capture_time) + " seconds")
+        
+        sleep(picamera_capture_interval - image_capture_time)
 
 
