@@ -95,6 +95,7 @@ with picamera.PiCamera() as camera:
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
         append_csv(images_log_path, [image_name])
+        print("took image")
         current_duration = time() - current_start_time
         sleep((picamera_capture_interval / 3) - current_duration)
         
