@@ -18,7 +18,7 @@ sensehat = SenseHat()
 picamera_capture_interval = 20
 
 # average flight time is 98.92 minutes
-timeout = 60 * 110
+timeout = 60 * 200
 
 # define path to log directory
 log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + strftime("%Y%m%d_%H%M%S_%Z"))
