@@ -26,7 +26,7 @@ picamera_capture_interval = 15
 timeout_seconds = 60 * 225
 
 # define path to log directory
-log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + strftime("%Y%m%d_%H%M%S_%Z"))
+log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + strftime('%Y%m%d_%H%M%S_%Z'))
 
 # create path to log directory if it doesn't exist
 if not os.path.exists(log_dir):
@@ -38,32 +38,8 @@ with open(os.path.join(log_dir, 'sensor.log'), 'w') as sensor_log:
 with open(os.path.join(log_dir, 'images.log'), 'w') as images_log:
     images_log.write('DateTime,ImagePath' + '\n')
 
-# create loggers
-sensor_logger = logging.getLogger('sensor')
-images_logger = logging.getLogger('images')
-
-# set logging levels
-sensor_logger.setLevel(logging.INFO)
-images_logger.setLevel(logging.INFO)
-
-# create file handlers
-sensor_file_handler = logging.FileHandler(os.path.join(log_dir, 'sensor.log'))
-images_file_handler = logging.FileHandler(os.path.join(log_dir, 'images.log'))
-
-# set file handler logging levels
-sensor_file_handler.setLevel(logging.DEBUG)
-images_file_handler.setLevel(logging.DEBUG)
-
-# add formatters to the file handlers
-sensor_file_handler.setFormatter(logging.Formatter(strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
-images_file_handler.setFormatter(logging.Formatter(strftime("%Y-%m-%d %H:%M:%S %Z") + ',%(levelname)s,%(message)s'))
-
-# add file handlers to the loggers
-sensor_logger.addHandler(sensor_file_handler)
-images_logger.addHandler(images_file_handler)
-
 # define function to return a csv line of all sensehat data
-def get_sensehat_data_csv():
+def get_sensehat_data_csv_line():
     output_data = []
 
     output_data.append(sensehat.get_temperature_from_humidity())
@@ -86,15 +62,19 @@ def get_sensehat_data_csv():
     # return output data in CSV format
     return ','.join(str(value) for value in output_data)
 
+def append_csv(file, input_data):
+    file.write(strftime('%Y-%m-%d %H:%M:%S %Z') + ',' + ','.join(input_data) + '\n')
+
+append_csv(['Log start'])
+
 # define starting time
 logging_start_time = time()
 
 with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
     camera.resolution = (3280, 2464)
-    
-    images_logger.info('Camera successfully initialized')
-    sensor_logger.info('Camera successfully initialized')
+       
+    append_csv('Camera initialized')
     
     # continue until timeout is exceeded
     while time() < logging_start_time + timeout_seconds:
@@ -102,7 +82,7 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
 
         # log sensor data
-        sensor_logger.info(get_sensehat_data_csv())
+        append_csv(get_sensehat_data_csv_line())
 
         current_duration = time() - current_start_time
 
@@ -111,18 +91,18 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
         
         # log sensor data
-        sensor_logger.info(get_sensehat_data_csv())
+        append_csv(get_sensehat_data_csv_line())
         
         # capture unencoded RGB directly to binary file
-        image_name = os.path.join(log_dir, strftime("%Y%m%d_%H%M%S_%Z") + '_rgb_' + '.bip')
+        image_name = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_rgb_' + '.bip')
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
 
         # log image save
-        images_logger.info(image_name)
+        append_csv([image_name])
         
         # log sensor data
-        sensor_logger.info(get_sensehat_data_csv())
+        append_csv(get_sensehat_data_csv_line())
         
         # get the time it took to capture the most recent image
         current_duration = time() - current_start_time
@@ -134,8 +114,10 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
 
         # log sensor data
-        sensor_logger.info(get_sensehat_data_csv())
+        append_csv(get_sensehat_data_csv_line())
 
         current_duration = time() - current_start_time
 
         sleep((picamera_capture_interval / 3) - current_duration)
+
+append_csv(['Log end'])
