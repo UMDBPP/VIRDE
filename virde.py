@@ -98,7 +98,7 @@ with picamera.PiCamera() as camera:
         append_csv(sensor_log_path, get_sensehat_data_csv_line())
         
         # capture unencoded RGB directly to binary file
-        image_name = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_rgb_' + '.bip')
+        image_name = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_rgb' + '.bip')
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
 
