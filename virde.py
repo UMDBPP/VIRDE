@@ -60,7 +60,7 @@ def get_sensehat_data_csv_line():
     output_data.extend([gyroscope['x'], gyroscope['y'], gyroscope['z']])
 
     # return output data in CSV format
-    return ','.join(str(value) for value in output_data)
+    return output_data
 
 def append_csv(filename, input_data):
     with open(filename, 'a') as csv_file:
