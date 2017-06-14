@@ -75,7 +75,7 @@ with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
     camera.resolution = (3280, 2464)
        
-    append_csv('Camera initialized')
+    append_csv(os.path.join(log_dir, 'images.log'), ['Camera initialized'])
     
     # continue until timeout is exceeded
     while time() < logging_start_time + timeout_seconds:
