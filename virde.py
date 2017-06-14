@@ -32,10 +32,13 @@ log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + strftime('%Y%m%
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
+sensor_log_path = os.path.join(log_dir, 'sensor.log')
+images_log_path = os.path.join(log_dir, 'images.log')
+
 # add headers to log files
-with open(os.path.join(log_dir, 'sensor.log'), 'w') as sensor_log:
+with open(sensor_log_path, 'w') as sensor_log:
     sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z' + '\n')
-with open(os.path.join(log_dir, 'images.log'), 'w') as images_log:
+with open(images_log_path, 'w') as images_log:
     images_log.write('DateTime,ImagePath' + '\n')
 
 # define function to return a csv line of all sensehat data
@@ -66,7 +69,7 @@ def append_csv(filename, input_data):
     with open(filename, 'a') as csv_file:
         csv_file.write(strftime('%Y-%m-%d %H:%M:%S %Z') + ',' + ','.join(str(value) for value in input_data) + '\n')
 
-append_csv(os.path.join(log_dir, 'images.log'), ['Log start'])
+append_csv(images_log_path, ['Log start'])
 
 # define starting time
 logging_start_time = time()
@@ -75,7 +78,7 @@ with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
     camera.resolution = (3280, 2464)
        
-    append_csv(os.path.join(log_dir, 'images.log'), ['Camera initialized'])
+    append_csv(images_log_path, ['Camera initialized'])
     
     # continue until timeout is exceeded
     while time() < logging_start_time + timeout_seconds:
@@ -83,7 +86,7 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
 
         # log sensor data
-        append_csv(os.path.join(log_dir, 'sensor.log'), get_sensehat_data_csv_line())
+        append_csv(sensor_log_path, get_sensehat_data_csv_line())
 
         current_duration = time() - current_start_time
 
@@ -92,7 +95,7 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
         
         # log sensor data
-        append_csv(os.path.join(log_dir, 'sensor.log'), get_sensehat_data_csv_line())
+        append_csv(sensor_log_path, get_sensehat_data_csv_line())
         
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_rgb_' + '.bip')
@@ -100,7 +103,7 @@ with picamera.PiCamera() as camera:
             camera.capture(binary_file, 'rgb')
 
         # log image save
-        append_csv(os.path.join(log_dir, 'images.log'), [image_name])
+        append_csv(images_log_path, [image_name])
         
         # get the time it took to capture the most recent image
         current_duration = time() - current_start_time
@@ -112,10 +115,10 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
 
         # log sensor data
-        append_csv(os.path.join(log_dir, 'images.log'), get_sensehat_data_csv_line())
+        append_csv(sensor_log_path, get_sensehat_data_csv_line())
 
         current_duration = time() - current_start_time
 
         sleep((picamera_capture_interval / 3) - current_duration)
 
-append_csv(os.path.join(log_dir, 'images.log'), ['Log end'])
+append_csv(images_log_path, ['Log end'])
