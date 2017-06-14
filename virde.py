@@ -20,10 +20,10 @@ from sense_hat import SenseHat
 sensehat = SenseHat()
 
 # define camera capture interval
-picamera_capture_interval = 9
+picamera_capture_interval = 15
 
 # average flight time is 98.92 minutes, longest ever flight was 175.53 minutes
-timeout_seconds = 81 #* 225
+timeout_seconds = 135 #* 225
 
 # define path to log directory
 log_dir = os.path.join('/home/pi/Desktop', 'virde_log', 'log_' + strftime('%Y%m%d_%H%M%S_%Z'))
