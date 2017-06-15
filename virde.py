@@ -43,7 +43,7 @@ with open(images_log_path, 'w') as images_log:
     images_log.write('DateTime,ImagePath' + '\n')
 
 # define function to return a csv line of all sensehat data
-def get_sensehat_data_csv_line():
+def get_sensehat_data():
     output_data = []
 
     output_data.append(sensehat.get_temperature_from_humidity())
@@ -67,29 +67,32 @@ def get_sensehat_data_csv_line():
     return output_data
 
 def append_csv(filename, input_data):
+    if isinstance(input_data, str):
+        input_data = [input_data]
+    
     with open(filename, 'a') as csv_file:
         csv_file.write(strftime('%Y-%m-%d %H:%M:%S %Z') + ',' + ','.join(str(value) for value in input_data) + '\n')
 
 # note starting time
 logging_start_time = time()
-append_csv(images_log_path, ['Log start'])
+append_csv(images_log_path, 'Log start')
 
 with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
     camera.resolution = (3280, 2464)
-    append_csv(images_log_path, ['Camera initialized'])
+    append_csv(images_log_path, 'Camera initialized')
     
     # continue until timeout is exceeded
     while time() < logging_start_time + timeout_seconds:
         # begin pre capture sensor log
         current_start_time = time()
-        append_csv(sensor_log_path, get_sensehat_data_csv_line())
+        append_csv(sensor_log_path, get_sensehat_data())
         current_duration = time() - current_start_time
         sleep((picamera_capture_interval / 3) - current_duration)
 
         # begin capture sensor log
         current_start_time = time()
-        append_csv(sensor_log_path, get_sensehat_data_csv_line())
+        append_csv(sensor_log_path, get_sensehat_data())
         # capture unencoded RGB directly to binary file
         image_name = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_rgb' + '.bip')
         with open(image_name, 'wb') as binary_file:
@@ -101,8 +104,8 @@ with picamera.PiCamera() as camera:
         
         # begin post capture sensor log
         current_start_time = time()
-        append_csv(sensor_log_path, get_sensehat_data_csv_line())
+        append_csv(sensor_log_path, get_sensehat_data())
         current_duration = time() - current_start_time
         sleep((picamera_capture_interval / 3) - current_duration)
 
-append_csv(images_log_path, ['Log end'])
+append_csv(images_log_path, 'Log end')
