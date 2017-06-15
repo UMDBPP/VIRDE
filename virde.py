@@ -33,7 +33,7 @@ if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
 # define log file path
-sensor_log_path = os.path.join(log_dir, 'sensor_log.csv')
+sensor_log_path = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_sensor_log.csv')
 
 # write header
 with open(sensor_log_path, 'w') as sensor_log:
