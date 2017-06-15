@@ -67,11 +67,15 @@ def get_sensehat_data():
     return output_data
 
 def append_csv(filename, input_data):
-    if isinstance(input_data, str):
-        input_data = [input_data]
+    output_line = strftime('%Y-%m-%d %H:%M:%S %Z') + ','
     
+    if isinstance(input_data, str):
+        output_line += input_data
+    else:
+        output_line += ','.join(str(value) for value in input_data)
+
     with open(filename, 'a') as csv_file:
-        csv_file.write(strftime('%Y-%m-%d %H:%M:%S %Z') + ',' + ','.join(str(value) for value in input_data) + '\n')
+        csv_file.write(output_line + '\n')
 
 # note starting time
 logging_start_time = time()
