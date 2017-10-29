@@ -56,5 +56,5 @@ while True:
     #print("raw_imu: " + str(yaw) + " " + str(pitch) + " " + str(roll))
     #print("raw_mag: " + str(mag_x) + " " + str(mag_y) + " " + str(mag_z))
     #print("heading: " + str(heading))
-    #print("compass: " + str(dir) + " " + str(dir_inverted))
-    print(str(abs(dir_inverted - heading)))
+    print(str(dir_inverted) + " " + str(heading))
+    #print(str(abs(dir_inverted - heading)))
