@@ -62,7 +62,7 @@ while True:
     print("%d %d %d" % (dir_inverted, original_heading, dir_inverted - original_heading))
     #print(str(abs(dir_inverted - heading)))
     
-    led_index = int(led_degree_ratio * heading)
+    led_index = int(led_degree_ratio * original_heading)
     offset = led_loop[led_index]
     
     y = offset // 8  # row
