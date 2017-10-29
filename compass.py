@@ -8,7 +8,7 @@ from sense_hat import SenseHat
 # The calibration program will produce the file RTIMULib.ini
 # Copy it into the same folder as your Python code
 
-led_loop = [4, 5, 6, 7, 15, 23, 31, 39, 47, 55, 63, 62, 61, 60, 59, 58, 57, 56, 48, 40, 32, 24, 16, 8, 0, 1, 2, 3]
+led_loop = [31, 39, 47, 55, 63, 62, 61, 60, 59, 58, 57, 56, 48, 40, 32, 24, 16, 8, 0, 1, 2, 3, 4, 5, 6, 7, 15, 23]
 
 sense = SenseHat()
 sense.set_rotation(0)
