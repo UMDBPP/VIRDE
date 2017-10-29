@@ -22,19 +22,6 @@ led_degree_ratio = len(led_loop) / 360.0
 while True:
     dir = sense.get_compass()
     dir_inverted = 360 - dir  # So LED appears to follow North
-    led_index = int(led_degree_ratio * dir_inverted)
-    offset = led_loop[led_index]
-    
-    y = offset // 8  # row
-    x = offset % 8  # column
-
-    if x != prev_x or y != prev_y:
-        sense.set_pixel(prev_x, prev_y, 0, 0, 0)
-
-    sense.set_pixel(x, y, 0, 0, 255)
-
-    prev_x = x
-    prev_y = y
     
     magnetometer = sense.get_compass_raw()
     orientation = sense.get_orientation()
@@ -68,10 +55,21 @@ while True:
     
     if original_heading < 0:
         original_heading = original_heading + 360
-         
     
     print("raw_imu: %d %d %d" % (yaw, pitch, roll))
     print("raw_mag: %d %d %d" % (mag_x, mag_y, mag_z))
     #print("heading: " + str(heading))
     print("%d %d %d" % (dir_inverted, original_heading, dir_inverted - original_heading))
     #print(str(abs(dir_inverted - heading)))
+    
+    led_index = int(led_degree_ratio * heading)
+    offset = led_loop[led_index]
+    
+    y = offset // 8  # row
+    x = offset % 8  # column
+
+    if x != prev_x or y != prev_y:
+        sense.set_pixel(prev_x, prev_y, 0, 0, 0)
+        sense.set_pixel(x, y, 0, 0, 255)
+        prev_x = x
+        prev_y = y
