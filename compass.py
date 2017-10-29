@@ -53,12 +53,25 @@ while True:
 
     heading = math.atan2(Y_h, X_h) * 180 / math.pi  #+ 180
     
-    if heading < 0:
-        heading = heading + 360
-        
+    original_heading = heading
+    
+    if X_h < 0:
+        heading = 180 - heading
+    elif X_h > 0 and Y_h < 0:
+        heading = heading * -1
+    elif X_h > 0 and Y_h > 0:
+        heading = 360 - heading
+    elif X_h == 0 and Y_h < 0:
+        heading = 90
+    elif X_h == 0 and Y_h > 0:
+        heading = 270
+    
+    if original_heading < 0:
+        original_heading = original_heading + 360
+         
     
     #print("raw_imu: " + str(yaw) + " " + str(pitch) + " " + str(roll))
     #print("raw_mag: " + str(mag_x) + " " + str(mag_y) + " " + str(mag_z))
     #print("heading: " + str(heading))
-    print(str(dir_inverted) + " " + str(heading) + " " + str(dir_inverted - heading))
+    print(str(dir_inverted) + " " + str(original_heading) + " " + str(heading) + " " + str(dir_inverted - original_heading) + " " + str(dir_inverted - heading))
     #print(str(abs(dir_inverted - heading)))
