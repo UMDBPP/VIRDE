@@ -37,7 +37,7 @@ while True:
     prev_y = y
     
     magnetometer = sense.get_compass_raw()
-    orientation = sensehat.get_orientation()
+    orientation = sense.get_orientation()
     
     mag_x = magnetometer['x']
     mag_y = magnetometer['y']
