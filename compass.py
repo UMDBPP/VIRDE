@@ -55,23 +55,23 @@ while True:
     
     original_heading = heading
     
-    if X_h < 0:
-        heading = 180 - heading
-    elif X_h > 0 and Y_h < 0:
-        heading = heading * -1
-    elif X_h > 0 and Y_h > 0:
-        heading = 360 - heading
-    elif X_h == 0 and Y_h < 0:
-        heading = 90
-    elif X_h == 0 and Y_h > 0:
-        heading = 270
+#     if X_h < 0:
+#         heading = 180 - heading
+#     elif X_h > 0 and Y_h < 0:
+#         heading = heading * -1
+#     elif X_h > 0 and Y_h > 0:
+#         heading = 360 - heading
+#     elif X_h == 0 and Y_h < 0:
+#         heading = 90
+#     elif X_h == 0 and Y_h > 0:
+#         heading = 270
     
     if original_heading < 0:
         original_heading = original_heading + 360
          
     
-    #print("raw_imu: " + str(yaw) + " " + str(pitch) + " " + str(roll))
-    #print("raw_mag: " + str(mag_x) + " " + str(mag_y) + " " + str(mag_z))
+    print("raw_imu: %d %d %d" % (yaw, pitch, roll))
+    print("raw_mag: %d %d %d" % (mag_x, mag_y, mag_z))
     #print("heading: " + str(heading))
-    print(str(dir_inverted) + " " + str(original_heading) + " " + str(heading) + " " + str(dir_inverted - original_heading) + " " + str(dir_inverted - heading))
+    print("%d %d %d" % (dir_inverted, original_heading, dir_inverted - original_heading))
     #print(str(abs(dir_inverted - heading)))
