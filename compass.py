@@ -53,7 +53,7 @@ while True:
 
     heading = math.atan2(Y_h, X_h) * 180 / math.pi  #+ 180
     
-    print("raw_imu: " + yaw + " " + pitch + " " + roll)
-    print("raw_mag: " + mag_x + " " + mag_y + " " + mag_z)
-    print("heading: " + heading)
-    print("compass: " + dir + " " + dir_inverted)
+    print("raw_imu: " + str(yaw) + " " + str(pitch) + " " + str(roll))
+    print("raw_mag: " + str(mag_x) + " " + str(mag_y) + " " + str(mag_z))
+    print("heading: " + str(heading))
+    print("compass: " + str(dir) + " " + str(dir_inverted))
