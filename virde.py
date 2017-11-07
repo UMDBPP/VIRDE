@@ -37,7 +37,7 @@ sensor_log_path = os.path.join(log_dir, strftime('%Y%m%d_%H%M%S_%Z') + '_sensor_
 
 # write header
 with open(sensor_log_path, 'w') as sensor_log:
-    sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Pitch,Roll,Yaw,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z,Message' + '\n')
+    sensor_log.write('DateTime,Temp_h,Temp_p,Humidity,Pressure,Yaw,Pitch,Roll,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z,Message' + '\n')
 
 # define function to return a csv line of all sensehat data
 def get_sensehat_data():
