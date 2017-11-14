@@ -20,7 +20,7 @@ from sense_hat import SenseHat
 sensehat = SenseHat()
 
 # define camera capture interval
-picamera_capture_interval = 15
+picamera_capture_interval = 6
 
 # average flight time is 98.92 minutes, longest ever flight was 175.53 minutes
 timeout_seconds = 60 * 225
