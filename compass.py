@@ -3,11 +3,11 @@ import sys
 import math
 
 from sense_hat import SenseHat
-import gps
+import gpsdData
  
 # Listen on port 2947 (gpsd) of localhost
-session = gps.gps("localhost", "2947")
-session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
+session = gpsdData.gpsdData("localhost", "2947")
+session.stream(gpsdData.WATCH_ENABLE | gpsdData.WATCH_NEWSTYLE)
  
 # To get good results with the magnetometer you must first calibrate it using
 # the program in RTIMULib/Linux/RTIMULibCal

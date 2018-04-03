@@ -3,7 +3,8 @@
 # License: GPL 2.0
 
 import os
-from gps import *
+from gpsdData import *
+import gpsdData
 from time import *
 import time
 import threading
@@ -17,7 +18,7 @@ class GpsPoller(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         global gpsd  # bring it in scope
-        gpsd = gps(mode=1)  # starting the stream of info
+        gpsd = gpsdData(mode=1)  # starting the stream of info
         self.current_value = None
         self.running = True  # setting the thread running to true
 
