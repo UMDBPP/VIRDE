@@ -3,7 +3,8 @@
 # License: GPL 2.0
 
 import os
-import gps
+from gps import *
+from time import *
 import time
 import threading
 
