@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # modified from
 # https://www.raspberrypi.org/learning/sense-hat-data-debug_logger/code/Sense_Logger_v4.py
 

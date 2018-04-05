@@ -1,6 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import sys
 import math
+
 
 from sense_hat import SenseHat
 import gpsdData
