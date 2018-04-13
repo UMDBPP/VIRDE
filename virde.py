@@ -86,7 +86,7 @@ def get_gps_data():
 
     gps_error = gps_data.error
 
-    output_data.append(time.time())
+    output_data.append(time())
     output_data.append(gps_data.time)
     output_data.append(gps_data.lon)
     output_data.append(gps_data.lat)
