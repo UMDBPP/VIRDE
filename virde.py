@@ -91,10 +91,10 @@ def get_gps_data():
     output_data.append(gps_data.lon)
     output_data.append(gps_data.lat)
     output_data.append(gps_data.alt)
-    output_data.append(gps_error.t)
-    output_data.append(gps_error.x)
-    output_data.append(gps_error.y)
-    output_data.append(gps_error.v)
+    output_data.append(gps_error['t')
+    output_data.append(gps_error['x'])
+    output_data.append(gps_error['y'])
+    output_data.append(gps_error['v'])
 
     return output_data
 
