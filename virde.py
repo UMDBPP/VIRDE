@@ -8,15 +8,17 @@
 
 # package imports
 import os
-from time import sleep, time, strftime
+from time import time, strftime, sleep
 
+import gpsd
 # Raspberry Pi hardware imports
-import picamera
-import picamera.array
 from sense_hat import SenseHat
 
 # initialize SenseHat
 sensehat = SenseHat()
+
+# initialize Ultimate GPS HAT
+gpsd.connect()
 
 # define camera capture interval
 picamera_capture_interval = 6
@@ -35,22 +37,24 @@ if not os.path.exists(log_dir):
 # define log file path
 sensor_log_path = os.path.join(log_dir, strftime(
     '%Y%m%d_%H%M%S_%Z') + '_sensor_log.csv')
+gps_log_path = os.path.join(log_dir, strftime(
+    '%Y%m%d_%H%M%S_%Z') + '_gps_log.csv')
 
 # write header
 with open(sensor_log_path, 'w') as sensor_log:
     sensor_log.write(
-        'DateTime,Temp_h,Temp_p,Humidity,Pressure,Yaw,Pitch,Roll,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z,Message' + '\n')
+        'DateTime,Yaw,Pitch,Roll,Mag_x,Mag_y,Mag_z,Accel_x,Accel_y,Accel_z,Gyro_x,Gyro_y,Gyro_z,Temp_h,Temp_p,Humidity,Pressure,Message' + '\n')
+
+with open(gps_log_path, 'w') as gps_log:
+    gps_log.write(
+        'DateTime,GPS_Time,Longitude,Latitude,Altitude_m,Tim_unc,Lon_unc,Lat_unc,Alt_unc' + '\n')
+
 
 # define function to return a csv line of all sensehat data
 
 
 def get_sensehat_data():
     output_data = []
-
-    output_data.append(sensehat.get_temperature_from_humidity())
-    output_data.append(sensehat.get_temperature_from_pressure())
-    output_data.append(sensehat.get_humidity())
-    output_data.append(sensehat.get_pressure())
 
     orientation = sensehat.get_orientation()
     output_data.extend(
@@ -67,7 +71,31 @@ def get_sensehat_data():
     gyroscope = sensehat.get_gyroscope_raw()
     output_data.extend([gyroscope['x'], gyroscope['y'], gyroscope['z']])
 
+    output_data.append(sensehat.get_temperature_from_humidity())
+    output_data.append(sensehat.get_temperature_from_pressure())
+    output_data.append(sensehat.get_humidity())
+    output_data.append(sensehat.get_pressure())
+
     # return output data in CSV format
+    return output_data
+
+
+def get_gps_data():
+    gps_data = gpsd.get_current()
+    output_data = []
+
+    gps_error = gps_data.error
+
+    output_data.append(time.time())
+    output_data.append(gps_data.time)
+    output_data.append(gps_data.lon)
+    output_data.append(gps_data.lat)
+    output_data.append(gps_data.alt)
+    output_data.append(gps_error.t)
+    output_data.append(gps_error.x)
+    output_data.append(gps_error.y)
+    output_data.append(gps_error.v)
+
     return output_data
 
 
@@ -86,6 +114,7 @@ def append_csv(filename, input_data):
 # note starting time
 logging_start_time = time()
 append_csv(sensor_log_path, get_sensehat_data() + ['Log start'])
+append_csv(gps_log_path, get_gps_data())
 
 with picamera.PiCamera() as camera:
     # set to maximum v2 resolution
@@ -96,7 +125,9 @@ with picamera.PiCamera() as camera:
     while time() < logging_start_time + timeout_seconds:
         # begin pre capture sensor log
         current_start_time = time()
+
         append_csv(sensor_log_path, get_sensehat_data() + [''])
+        append_csv(gps_log_path, get_gps_data())
         current_duration = time() - current_start_time
         sleep((picamera_capture_interval / 3) - current_duration)
 
@@ -104,8 +135,11 @@ with picamera.PiCamera() as camera:
         current_start_time = time()
         image_name = os.path.join(log_dir, strftime(
             '%Y%m%d_%H%M%S_%Z') + '_rgb' + '.bip')
+
         append_csv(sensor_log_path, get_sensehat_data() +
                    ['RGB image captured to ' + image_name])
+        append_csv(gps_log_path, get_gps_data())
+
         # capture unencoded RGB directly to binary file
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
@@ -114,8 +148,12 @@ with picamera.PiCamera() as camera:
 
         # begin post capture sensor log
         current_start_time = time()
+
         append_csv(sensor_log_path, get_sensehat_data() + [''])
+        append_csv(gps_log_path, get_gps_data())
+
         current_duration = time() - current_start_time
         sleep((picamera_capture_interval / 3) - current_duration)
 
 append_csv(sensor_log_path, get_sensehat_data() + ['Log end'])
+append_csv(gps_log_path, get_gps_data())
