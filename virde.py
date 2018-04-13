@@ -10,9 +10,10 @@
 import os
 from time import time, strftime, sleep
 
-import gpsd
 # Raspberry Pi hardware imports
+import picamera
 from sense_hat import SenseHat
+import gpsd
 
 # initialize SenseHat
 sensehat = SenseHat()
