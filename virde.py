@@ -123,16 +123,11 @@ with picamera.PiCamera() as camera:
     # continue until timeout is exceeded
     while time() < logging_start_time + timeout_seconds:
         # begin pre capture sensor log
-        current_start_time = time()
-
         append_csv(sensor_log_path, get_sensehat_data() + [''])
         append_csv(gps_log_path, get_gps_data())
-        current_duration = time() - current_start_time
-        print(current_duration)
-        sleep((picamera_capture_interval / 3) - current_duration)
+        sleep(picamera_capture_interval / 3)
 
         # begin capture sensor log
-        current_start_time = time()
         image_name = os.path.join(log_dir, strftime(
             '%Y%m%d_%H%M%S_%Z') + '_rgb' + '.bip')
 
@@ -143,16 +138,11 @@ with picamera.PiCamera() as camera:
         # capture unencoded RGB directly to binary file
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
-        current_duration = time() - current_start_time
-        print(current_duration)
-        sleep((picamera_capture_interval / 3) - current_duration)
+        sleep(picamera_capture_interval / 3)
 
         # begin post capture sensor log
-        current_start_time = time()
         append_csv(sensor_log_path, get_sensehat_data() + [''])
         append_csv(gps_log_path, get_gps_data())
-        current_duration = time() - current_start_time
-        print(current_duration)
         sleep(picamera_capture_interval / 3)
 
 append_csv(sensor_log_path, get_sensehat_data() + ['Log end'])
