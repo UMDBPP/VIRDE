@@ -52,8 +52,6 @@ with open(gps_log_path, 'w') as gps_log:
 
 
 # define function to return a csv line of all sensehat data
-
-
 def get_sensehat_data():
     output_data = []
 
@@ -130,6 +128,7 @@ with picamera.PiCamera() as camera:
         append_csv(sensor_log_path, get_sensehat_data() + [''])
         append_csv(gps_log_path, get_gps_data())
         current_duration = time() - current_start_time
+        print(current_duration)
         sleep((picamera_capture_interval / 3) - current_duration)
 
         # begin capture sensor log
@@ -145,16 +144,16 @@ with picamera.PiCamera() as camera:
         with open(image_name, 'wb') as binary_file:
             camera.capture(binary_file, 'rgb')
         current_duration = time() - current_start_time
+        print(current_duration)
         sleep((picamera_capture_interval / 3) - current_duration)
 
         # begin post capture sensor log
         current_start_time = time()
-
         append_csv(sensor_log_path, get_sensehat_data() + [''])
         append_csv(gps_log_path, get_gps_data())
-
         current_duration = time() - current_start_time
-        sleep((picamera_capture_interval / 3) - current_duration)
+        print(current_duration)
+        sleep(picamera_capture_interval / 3)
 
 append_csv(sensor_log_path, get_sensehat_data() + ['Log end'])
 append_csv(gps_log_path, get_gps_data())
