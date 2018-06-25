@@ -12,6 +12,7 @@ import time
 
 # Raspberry Pi hardware imports
 import picamera
+from picamera import array
 from sense_hat import SenseHat
 import gpsd
 
@@ -50,6 +51,7 @@ with open(gps_log_path, 'w') as gps_log:
     gps_log.write(
         'DateTime,GPS_Time,Longitude,Latitude,Altitude_m,Tim_unc,Lon_unc,Lat_unc,Alt_unc' + '\n')
 
+image_size = (3280, 2464)
 
 # define function to return a csv line of all sensehat data
 def get_sensehat_data():
@@ -116,34 +118,40 @@ append_csv(sensor_log_path, get_sensehat_data() + ['Log start'])
 append_csv(gps_log_path, get_gps_data())
 
 with picamera.PiCamera() as camera:
-    # set to maximum v2 resolution
-    camera.resolution = (3280, 2464)
-    append_csv(sensor_log_path, get_sensehat_data() + ['Camera initialized'])
+    with picamera.array.PiRGBArray(camera) as output:
+        # set to maximum v2 resolution
+        camera.resolution = image_size
 
-    # continue until timeout is exceeded
-    while time.time() < logging_start_time + timeout_seconds:
-        # begin pre capture sensor log
-        append_csv(sensor_log_path, get_sensehat_data() + [''])
-        append_csv(gps_log_path, get_gps_data())
-        time.sleep(picamera_capture_interval / 3)
+        append_csv(sensor_log_path, get_sensehat_data() + ['Camera initialized'])
 
-        # begin capture sensor log
-        image_name = os.path.join(log_dir, time.strftime(
-            '%Y%m%d_%H%M%S_%Z') + '_rgb' + '.png')
+        # continue until timeout is exceeded
+        while time.time() < logging_start_time + timeout_seconds:
+            # begin pre capture sensor log
+            append_csv(sensor_log_path, get_sensehat_data() + [''])
+            append_csv(gps_log_path, get_gps_data())
 
-        append_csv(sensor_log_path, get_sensehat_data() +
-                   ['RGB image captured to ' + image_name])
-        append_csv(gps_log_path, get_gps_data())
+            #
+            time.sleep(picamera_capture_interval / 3)
 
-        # capture unencoded RGB directly to binary file
-        with open(image_name, 'w') as image_file:
-            camera.capture(image_file, 'png')
-        time.sleep(picamera_capture_interval / 3)
+            # begin capture sensor log
+            image_name = os.path.join(log_dir, time.strftime(
+                '%Y%m%d_%H%M%S_%Z') + '_rgb' + '.png')
 
-        # begin post capture sensor log
-        append_csv(sensor_log_path, get_sensehat_data() + [''])
-        append_csv(gps_log_path, get_gps_data())
-        time.sleep(picamera_capture_interval / 3)
+            append_csv(sensor_log_path, get_sensehat_data() +
+                       ['RGB image captured to ' + image_name])
+            append_csv(gps_log_path, get_gps_data())
+
+            # capture unencoded RGB to array
+            with open(image_name, 'w') as image_file:
+                camera.capture(output, 'rgb')
+
+            time.sleep(picamera_capture_interval / 3)
+
+            # begin post capture sensor log
+            append_csv(sensor_log_path, get_sensehat_data() + [''])
+            append_csv(gps_log_path, get_gps_data())
+
+            time.sleep(picamera_capture_interval / 3)
 
 append_csv(sensor_log_path, get_sensehat_data() + ['Log end'])
 append_csv(gps_log_path, get_gps_data())
