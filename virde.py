@@ -134,7 +134,7 @@ with picamera.PiCamera() as camera:
 
         # begin capture sensor log
         image_name = os.path.join(log_dir, time.strftime(
-            '%Y%m%d_%H%M%S_%Z') + '_rgb' + '.png')
+            '%Y%m%d_%H%M%S_%Z') + '_rgb' + '.bip')
 
         append_csv(sensor_log_path, get_sensehat_data() +
                    ['RGB image captured to ' + image_name])
@@ -142,7 +142,7 @@ with picamera.PiCamera() as camera:
 
         # capture unencoded RGB to array
         with open(image_name, 'w') as image_file:
-            camera.capture(image_name, 'png')
+            camera.capture(image_name, 'wb')
 
         time.sleep(picamera_capture_interval / 3)
 
