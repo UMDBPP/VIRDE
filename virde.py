@@ -141,8 +141,8 @@ with picamera.PiCamera() as camera:
         append_csv(gps_log_path, get_gps_data())
 
         # capture unencoded RGB to array
-        with open(image_name, 'w') as image_file:
-            camera.capture(image_name, 'wb')
+        with open(image_name, 'wb') as image_file:
+            camera.capture(image_name, 'rgb')
 
         time.sleep(picamera_capture_interval / 3)
 

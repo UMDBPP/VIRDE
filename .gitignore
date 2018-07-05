@@ -217,3 +217,5 @@ pip-log.txt
 
 # PyCharm
 .idea
+.idea/misc.xml
+.idea/other.xml
