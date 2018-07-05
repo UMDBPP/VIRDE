@@ -216,6 +216,4 @@ pip-log.txt
 .mr.developer.cfg
 
 # PyCharm
-.idea
-.idea/misc.xml
-.idea/other.xml
+.idea/*
